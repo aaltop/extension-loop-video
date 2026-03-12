@@ -1,0 +1,29 @@
+/*
+.*
+
+
+# INCLUDE BACK
+# ------------
+
+# DIRECTORIES
+# ------------
+
+!content_scripts
+!popup
+
+# DIRECTORIES
+# ============
+
+# FILES
+# ------------
+
+!.gitignore
+
+!icon.svg
+!manifest.json
+
+# FILES
+# ============
+
+# INCLUDE BACK
+# ============

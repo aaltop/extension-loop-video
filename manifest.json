@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "Loop Video",
+    "version": "1.0",
+  
+    "description": "Utility for looping videos.",
+    "icons": {
+      "32": "icon.svg",
+      "48": "icon.svg"
+    },
+  
+    "permissions": ["activeTab"],
+  
+    "browser_action": {
+      "default_icon": "icon.svg",
+      "default_title": "Loop Video",
+      "default_popup": "popup/loop_video.html"
+    }
+  }
