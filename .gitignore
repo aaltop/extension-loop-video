@@ -8,8 +8,8 @@
 # DIRECTORIES
 # ------------
 
-!content_scripts
-!popup
+!src
+!assets
 
 # DIRECTORIES
 # ============
@@ -20,7 +20,12 @@
 !.gitignore
 
 !icon.svg
-!manifest.json
+
+!package.json
+!pnpm-lock.yaml
+!README.md
+!tsconfig.json
+!wxt.config.ts
 
 # FILES
 # ============
