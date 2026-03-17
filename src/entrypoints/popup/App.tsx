@@ -9,9 +9,11 @@ type ValueSetter<T> = (newValue: T) => void;
 function VideoTimeInput({
   setter,
   state,
+  buttonText,
 }: {
   setter: ValueSetter<number>;
   state: { readonly videoTime: number };
+  buttonText: string;
 }) {
   return (
     <>
@@ -27,7 +29,7 @@ function VideoTimeInput({
           }
         }}
       >
-        Set as current time
+        {buttonText}
       </button>
       <span>{state.videoTime.toFixed(3)}</span>
     </>
@@ -87,6 +89,7 @@ function App() {
               setStartTime(() => newVal);
             }}
             state={{ videoTime: popupData.startTime }}
+            buttonText="Set start time"
           />
         </div>
         <div>
@@ -95,6 +98,7 @@ function App() {
               setEndTime(() => newVal);
             }}
             state={{ videoTime: popupData.endTime }}
+            buttonText="Set end time"
           />
         </div>
         <button
