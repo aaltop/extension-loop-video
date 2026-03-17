@@ -15,11 +15,18 @@ function addMessageHandler() {
     const dataKey = "loop_video:data";
     switch (com) {
       case "video_time":
-        console.log("Current video time:", video?.currentTime);
-        sendResponse<"video_time">(baseSendResponse, {
-          success: true,
-          data: { time: video?.currentTime ?? null },
-        });
+        const currentTime = video?.currentTime;
+        if (currentTime === undefined) {
+          sendResponse<"video_time">(baseSendResponse, {
+            success: false,
+            message: "No video found on page",
+          });
+        } else {
+          sendResponse<"video_time">(baseSendResponse, {
+            success: true,
+            data: { time: currentTime },
+          });
+        }
         break;
 
       case "save_data":
@@ -37,10 +44,19 @@ function addMessageHandler() {
       case "load_data":
         console.log("loading data for Loop Video...");
         const data = window.localStorage.getItem(dataKey);
-        sendResponse<"load_data">(baseSendResponse, {
-          success: true,
-          data: data ? JSON.parse(data) : null,
-        });
+
+        if (data === null) {
+          sendResponse<"load_data">(baseSendResponse, {
+            success: false,
+            message: "Data not found",
+          });
+        } else {
+          sendResponse<"load_data">(baseSendResponse, {
+            success: true,
+            data: JSON.parse(data),
+          });
+        }
+
         break;
 
       case "log_message":
@@ -51,8 +67,37 @@ function addMessageHandler() {
         });
         break;
 
+      case "enable_looping":
+        const intervalId = window.setInterval(() => {
+          if (!video) return;
+
+          if (video.currentTime >= message.data.endTime) {
+            video.currentTime = message.data.startTime;
+          }
+        }, 10);
+
+        sendResponse<"enable_looping">(baseSendResponse, {
+          success: true,
+          data: { intervalId },
+        });
+
+        break;
+
+      case "disable_looping":
+        window.clearInterval(message.data.intervalId);
+        sendResponse<"disable_looping">(baseSendResponse, {
+          success: true,
+          data: null,
+        });
+        break;
+
       default:
-        console.log(`Received unknown command ${com}`);
+        const unknownMessage = `Received unknown command ${com}`;
+        console.log(`Loop Video: ${unknownMessage}`);
+        sendResponse<"unknown">(baseSendResponse, {
+          success: false,
+          message: unknownMessage,
+        });
         break;
     }
   });
