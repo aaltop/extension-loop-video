@@ -11,6 +11,8 @@ export type CommandString =
   | "load_data"
   | "enable_looping"
   | "disable_looping"
+  | "element_list_length"
+  | "highlight_elements"
   | "unknown";
 
 /**
@@ -25,13 +27,27 @@ export interface RequestResponsePair<
 }
 
 /**
+ * Info about the loopable element.
+ */
+export interface LoopableInfo {
+  /**
+   * The index of the element in a list of possible elements.
+   */
+  loopableIndex: number;
+
+  /**
+   * Selectors as passed to `document.querySelectorAll()`.
+   */
+  selectors: string;
+}
+
+/**
  * Info needed to create a video (or similar) loop.
  */
-export interface LoopInfo {
+export interface LoopInfo extends LoopableInfo {
   startTime: number;
   endTime: number;
 }
-
 /**
  * The data retained by the popup.
  */
@@ -80,17 +96,17 @@ async function sendToTab<K extends keyof CommandRegistry>(
 
 export interface CommandRegistry {
   video_time: RequestResponsePair<
-    Request<"video_time", null>,
+    Request<"video_time", LoopableInfo>,
     Response<{ time: number }>
   >;
 }
 /**
- * Get the current time of a video component that is in the current tab.
+ * Get the current time of a video element that is in the current tab.
  */
-async function getVideoTime() {
+async function getVideoTime(data: LoopableInfo) {
   return await sendToTab<"video_time">({
     command: "video_time",
-    data: null,
+    data,
   });
 }
 
@@ -177,6 +193,44 @@ export interface CommandRegistry {
   unknown: RequestResponsePair<Request<"unknown", null>, Response<null>>;
 }
 
+interface ChooseVideoArgs extends Pick<LoopableInfo, "selectors"> {}
+export interface CommandRegistry {
+  element_list_length: RequestResponsePair<
+    Request<"element_list_length", ChooseVideoArgs>,
+    Response<{ length: number }>
+  >;
+}
+
+/**
+ * Check the length of a given list of elements.
+ */
+async function elementListLength(data: ChooseVideoArgs) {
+  return await sendToTab<"element_list_length">({
+    command: "element_list_length",
+    data,
+  });
+}
+
+interface HighlightComponentArgs extends Pick<LoopableInfo, "selectors"> {
+  indices: number[];
+}
+export interface CommandRegistry {
+  highlight_elements: RequestResponsePair<
+    Request<"highlight_elements", HighlightComponentArgs>,
+    Response<null>
+  >;
+}
+/**
+ * Highlight elements based on the query selector and the given indices.
+ * See `elementListLength()` for querying the length of a list of elements.
+ */
+async function highlightElements(data: HighlightComponentArgs) {
+  return await sendToTab<"highlight_elements">({
+    command: "highlight_elements",
+    data,
+  });
+}
+
 /**
  * Holds commands used to communicate with a content script.
  */
@@ -187,4 +241,6 @@ export const commands = {
   loadData,
   enableLooping,
   disableLooping,
+  elementListLength,
+  highlightElements,
 };

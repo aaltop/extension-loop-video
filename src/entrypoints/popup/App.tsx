@@ -5,15 +5,21 @@ import { commands, PopupData } from "./commands";
 import { Response } from "@/src/typing/commands";
 
 type ValueSetter<T> = (newValue: T) => void;
+interface ValueState<T> {
+  readonly set: ValueSetter<T>;
+  readonly value: T;
+}
 
 function VideoTimeInput({
-  setter,
+  videoTime,
   state,
-  buttonText,
 }: {
-  setter: ValueSetter<number>;
-  state: { readonly videoTime: number };
-  buttonText: string;
+  videoTime: ValueState<number>;
+  state: {
+    buttonText: string;
+    videoIndex: number;
+    selectors: string;
+  };
 }) {
   return (
     <>
@@ -21,17 +27,80 @@ function VideoTimeInput({
         className="video-time-button"
         type="button"
         onClick={async () => {
-          const response = await commands.getVideoTime();
+          const response = await commands.getVideoTime({
+            loopableIndex: state.videoIndex,
+            selectors: state.selectors,
+          });
           if (response.success) {
-            setter(response.data.time);
+            videoTime.set(response.data.time);
           } else {
             await commands.logMessage(response.message);
           }
         }}
       >
-        {buttonText}
+        {state.buttonText}
       </button>
-      <span>{state.videoTime.toFixed(3)}</span>
+      <span>{videoTime.value.toFixed(3)}</span>
+    </>
+  );
+}
+
+function VideoHighlight({ indexVal }: { indexVal: ValueState<number> }) {
+  const [elemNum, setElemNum] = useState<number | null>(null);
+
+  useEffect(() => {
+    queryAndSetElemNum();
+  }, []);
+
+  async function getElementListLength(selectors: string) {
+    const response = await commands.elementListLength({
+      selectors,
+    });
+    if (response.success) {
+      return response.data.length;
+    }
+  }
+
+  const selectors = "video";
+
+  async function queryAndSetElemNum() {
+    const len = await getElementListLength(selectors);
+    setElemNum(() => len ?? null);
+  }
+
+  async function addToIndex(val: number) {
+    await queryAndSetElemNum();
+    const prev = indexVal.value;
+    if (elemNum === 0 || elemNum === null) {
+      return;
+    }
+
+    let newIndex = prev + val;
+    newIndex = (elemNum + (newIndex % elemNum)) % elemNum;
+    indexVal.set(newIndex);
+  }
+
+  return (
+    <>
+      <button type="button" onClick={async () => await addToIndex(-1)}>
+        Previous
+      </button>
+      <button
+        type="button"
+        onClick={async () => {
+          queryAndSetElemNum();
+          const indices = [indexVal.value];
+          const response = await commands.highlightElements({
+            selectors,
+            indices,
+          });
+        }}
+      >
+        {`Highlight video ${indexVal.value + 1} out of ${elemNum ?? "none"}`}
+      </button>
+      <button type="button" onClick={async () => await addToIndex(1)}>
+        Next
+      </button>
     </>
   );
 }
@@ -42,6 +111,8 @@ function App() {
   const [intervalId, setIntervalId] = useState<number | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [popupData, setPopupdata] = useState<PopupData>({
+    loopableIndex: 0,
+    selectors: "video",
     startTime: 0.0,
     endTime: 0.0,
   });
@@ -79,26 +150,47 @@ function App() {
     });
   }
 
+  function setLoopableIndex(setter: ValueUpdater<number>) {
+    setPopupdata((prev) => {
+      return {
+        ...prev,
+        loopableIndex: setter(prev.loopableIndex),
+      };
+    });
+  }
+
   return (
     <>
       <h1>Loop Video</h1>
       <div>
         <div>
           <VideoTimeInput
-            setter={(newVal) => {
-              setStartTime(() => newVal);
+            videoTime={{
+              set(newVal) {
+                setStartTime(() => newVal);
+              },
+              value: popupData.startTime,
             }}
-            state={{ videoTime: popupData.startTime }}
-            buttonText="Set start time"
+            state={{
+              buttonText: "Set start time",
+              videoIndex: popupData.loopableIndex,
+              selectors: popupData.selectors,
+            }}
           />
         </div>
         <div>
           <VideoTimeInput
-            setter={(newVal) => {
-              setEndTime(() => newVal);
+            videoTime={{
+              set(newVal) {
+                setEndTime(() => newVal);
+              },
+              value: popupData.endTime,
             }}
-            state={{ videoTime: popupData.endTime }}
-            buttonText="Set end time"
+            state={{
+              buttonText: "Set end time",
+              videoIndex: popupData.loopableIndex,
+              selectors: popupData.selectors,
+            }}
           />
         </div>
         <button
@@ -114,7 +206,12 @@ function App() {
             const response = await commands.loadData();
             handleResponse(response);
             if (response.success) {
-              setPopupdata((_prev) => response.data);
+              setPopupdata((prev) => {
+                return {
+                  ...prev,
+                  ...response.data,
+                };
+              });
             }
           }}
         >
@@ -132,6 +229,8 @@ function App() {
                 const response = await commands.enableLooping({
                   startTime: popupData.startTime,
                   endTime: popupData.endTime,
+                  loopableIndex: popupData.loopableIndex,
+                  selectors: popupData.selectors,
                 });
                 handleResponse(response);
                 if (response.success) {
@@ -142,10 +241,15 @@ function App() {
           >
             {intervalId !== null ? "Disable looping" : "Enable looping"}
           </button>
+          <VideoHighlight
+            indexVal={{
+              set(newValue) {
+                setLoopableIndex(() => newValue);
+              },
+              value: popupData.loopableIndex,
+            }}
+          />
         </div>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
       <p>{errorMsg}</p>
     </>
