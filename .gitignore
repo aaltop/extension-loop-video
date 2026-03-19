@@ -19,7 +19,7 @@
 
 !.gitignore
 
-!icon.svg
+!public
 
 !package.json
 !pnpm-lock.yaml

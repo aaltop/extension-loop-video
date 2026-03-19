@@ -10,4 +10,9 @@ export default defineConfig({
       firefox: BINARY_FIREFOX,
     },
   },
+  manifest: {
+    icons: Object.fromEntries(
+      [16, 24, 48, 96, 128].map((elem) => [elem, "/icon.svg"]),
+    ),
+  },
 });
