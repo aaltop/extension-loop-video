@@ -50,11 +50,38 @@ interface Permissions {
 }
 
 interface ContextHookArgs {}
+type ContextHook<T> = (args?: ContextHookArgs) => ValueState<T>;
+
+interface HookFactoryArgs<T> {
+  /**
+   * Given the state, returns the relevant value.
+   */
+  getFromState: (state: PopupData) => T;
+
+  /**
+   * Given the previous state and a new value, return an updated state.
+   */
+  createNewState: (prevState: PopupData, newValue: T) => PopupData;
+}
+
+function hookFactory<T>(args: HookFactoryArgs<T>): ContextHook<T> {
+  return function contextHook(hookArgs) {
+    const { state, setState } = useContext(SavedStateContext);
+    return {
+      set(newValue) {
+        setState(args.createNewState(state, newValue));
+      },
+      get() {
+        return args.getFromState(state);
+      },
+    };
+  };
+}
 
 /**
  * The saved state of the popup.
  */
-export function useSavedState(): ValueState<PopupData> {
+export function useSavedState(args?: ContextHookArgs): ValueState<PopupData> {
   const { state, setState } = useContext(SavedStateContext);
   return {
     set: setState,
@@ -67,66 +94,50 @@ export function useSavedState(): ValueState<PopupData> {
 /**
  * The index of the loopable element.
  */
-export function useLoopableIndex(args?: ContextHookArgs): ValueState<number> {
-  const { state, setState } = useContext(SavedStateContext);
-
-  return {
-    get() {
-      return state.loopableIndex;
-    },
-    set(newValue) {
-      setState({ ...state, loopableIndex: newValue });
-    },
-  };
-}
+export const useLoopableIndex = hookFactory<number>({
+  createNewState(prevState, newValue) {
+    return { ...prevState, loopableIndex: newValue };
+  },
+  getFromState(state) {
+    return state.loopableIndex;
+  },
+});
 
 /**
  * The selectors used to query for the loopable elements.
  */
-export function useSelectors(args?: ContextHookArgs): ValueState<string> {
-  const { state, setState } = useContext(SavedStateContext);
-
-  return {
-    get() {
-      return state.selectors;
-    },
-    set(newValue) {
-      setState({ ...state, selectors: newValue });
-    },
-  };
-}
+export const useSelectors = hookFactory<string>({
+  createNewState(prevState, newValue) {
+    return { ...prevState, selectors: newValue };
+  },
+  getFromState(state) {
+    return state.selectors;
+  },
+});
 
 /**
  * The loop startpoint.
  */
-export function useStartTime(args?: ContextHookArgs): ValueState<number> {
-  const { state, setState } = useContext(SavedStateContext);
-
-  return {
-    get() {
-      return state.startTime;
-    },
-    set(newValue) {
-      setState({ ...state, startTime: newValue });
-    },
-  };
-}
+export const useStartTime = hookFactory<number>({
+  createNewState(prevState, newValue) {
+    return { ...prevState, startTime: newValue };
+  },
+  getFromState(state) {
+    return state.startTime;
+  },
+});
 
 /**
  * The loop endpoint.
  */
-export function useEndTime(args?: ContextHookArgs): ValueState<number> {
-  const { state, setState } = useContext(SavedStateContext);
-
-  return {
-    get() {
-      return state.endTime;
-    },
-    set(newValue) {
-      setState({ ...state, endTime: newValue });
-    },
-  };
-}
+export const useEndTime = hookFactory<number>({
+  createNewState(prevState, newValue) {
+    return { ...prevState, endTime: newValue };
+  },
+  getFromState(state) {
+    return state.endTime;
+  },
+});
 
 /**
  * The loop endpoints.
