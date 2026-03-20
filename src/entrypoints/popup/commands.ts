@@ -10,6 +10,7 @@ export type CommandString =
   | "save_data"
   | "load_data"
   | "download_data"
+  | "load_data_from_file"
   | "enable_looping"
   | "disable_looping"
   | "element_list_length"
@@ -248,6 +249,23 @@ async function downloadData() {
   });
 }
 
+export interface CommandRegistry {
+  load_data_from_file: RequestResponsePair<
+    Request<"load_data_from_file", null>,
+    Response<null>
+  >;
+}
+
+/**
+ * Start the process of downloading data from file.
+ */
+async function loadDataFromFile() {
+  return await sendToTab<"load_data_from_file">({
+    command: "load_data_from_file",
+    data: null,
+  });
+}
+
 /**
  * Holds commands used to communicate with a content script.
  */
@@ -261,4 +279,5 @@ export const commands = {
   elementListLength,
   highlightElements,
   downloadData,
+  loadDataFromFile,
 };

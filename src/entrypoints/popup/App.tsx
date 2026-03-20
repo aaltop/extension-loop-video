@@ -205,6 +205,17 @@ function App() {
             Download data for current domain
           </button>
         </div>
+        <div>
+          <button
+            type="button"
+            onClick={async () => {
+              const response = await commands.loadDataFromFile();
+              handleResponse(response);
+            }}
+          >
+            Load data from file
+          </button>
+        </div>
       </div>
       <p>{errorMsg}</p>
     </>

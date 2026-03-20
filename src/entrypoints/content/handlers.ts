@@ -47,13 +47,26 @@ namespace storage {
     return data !== null && typeof data === "object";
   }
 
+  const LOOPING_DATA_KEY = "looping_data" as const;
   /**
    * Get the stored data of the extension for this domain.
    */
   export function getStoredData(): Record<string, PopupData> | undefined {
     const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
-    const parsedData = JSON.parse(data ?? "null");
+    let parsedData = JSON.parse(data ?? "null");
+    if (parsedData !== null) {
+      parsedData = parsedData[LOOPING_DATA_KEY];
+    }
     return storedDataIsValid(parsedData) ? parsedData : undefined;
+  }
+
+  /**
+   * Set the stored data.
+   */
+  export function setStoredData(data: Record<string, unknown>) {
+    const allData: Record<string, unknown> = {};
+    allData[LOOPING_DATA_KEY] = data;
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(allData));
   }
 }
 
@@ -163,7 +176,7 @@ const _responseHandlers: ResponseRegistry = {
     }
     previousData[url] = message.data;
 
-    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(previousData));
+    storage.setStoredData(previousData);
     sendResponse<"save_data">(baseSendResponse, {
       success: true,
       data: null,
@@ -206,6 +219,65 @@ const _responseHandlers: ResponseRegistry = {
       data: {
         filename,
       },
+    });
+  },
+
+  load_data_from_file: (message, baseSendResponse) => {
+    // create input and dialog to put it in
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".json";
+    const dialog = document.createElement("dialog");
+    dialog.appendChild(fileInput);
+
+    function closeAndRemoveDialog() {
+      dialog.close();
+      dialog.remove();
+    }
+
+    // a close button for the dialog
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.addEventListener("click", () => {
+      closeAndRemoveDialog();
+    });
+    closeButton.innerText = "Close";
+    dialog.appendChild(closeButton);
+
+    fileInput.addEventListener("change", async function () {
+      const files = this.files;
+      if (files !== null) {
+        const file = files[0];
+
+        const data = JSON.parse(await file.text());
+        if (data !== null || typeof data === "object") {
+          storage.setStoredData(data);
+          sendResponse<"load_data_from_file">(baseSendResponse, {
+            success: true,
+            data: null,
+          });
+          console.log("Loaded data from file");
+        } else {
+          sendResponse<"load_data_from_file">(baseSendResponse, {
+            success: false,
+            message: "Invalid data read from file: did not resemble an object",
+          });
+        }
+      }
+
+      closeAndRemoveDialog();
+    });
+
+    fileInput.addEventListener("cancel", () => {
+      closeAndRemoveDialog();
+    });
+
+    document.body.appendChild(dialog);
+    dialog.showModal();
+
+    sendResponse<"load_data_from_file">(baseSendResponse, {
+      success: true,
+      data: null,
     });
   },
 
