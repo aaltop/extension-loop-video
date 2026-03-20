@@ -2,10 +2,6 @@ import { createContext } from "react";
 import { PopupData } from "@/entrypoints/popup/commands";
 import { ValueState } from "@/src/typing/state";
 
-// type SavedStateAccessor = {
-//     [K in keyof PopupData]: ValueState<PopupData[K]>
-// }
-
 interface SavedStateAccessor {
   state: PopupData;
   setState: (newState: PopupData) => void;

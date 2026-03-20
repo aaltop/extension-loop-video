@@ -16,7 +16,7 @@ type ResponseRegistry = {
   [K in keyof CommandRegistry]: ResponseHandler<K>;
 };
 
-const LOCALSTORAGE_KEY = "loop_video:data" as const;
+const LOCALSTORAGE_KEY = "extension/loop_video" as const;
 const DATA_ATTRIBUTE_PREFIX = "data-loopvideo-" as const;
 
 /**
@@ -25,6 +25,15 @@ const DATA_ATTRIBUTE_PREFIX = "data-loopvideo-" as const;
  */
 function getDataAttributeKey(suffix: string) {
   return `${DATA_ATTRIBUTE_PREFIX}${suffix}`;
+}
+
+/**
+ * Get a key used for the extension's localStorage data.
+ * @param suffix Descriptive of the nature of the data. For representing
+ * hierarchy flatly, values should be delimited by forward slashes (/).
+ */
+function getStorageKey(suffix: string) {
+  return `${LOCALSTORAGE_KEY}/${suffix}`;
 }
 
 /**
@@ -109,26 +118,38 @@ const _responseHandlers: ResponseRegistry = {
   load_data: (message, baseSendResponse) => {
     console.log("loading data for Loop Video...");
     const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
-
-    if (data === null) {
+    const parsedData = JSON.parse(data ?? "null");
+    const url = document.URL;
+    if (
+      parsedData === null ||
+      typeof parsedData !== "object" ||
+      !parsedData[url]
+    ) {
       sendResponse<"load_data">(baseSendResponse, {
         success: false,
-        message: "Data not found",
+        message: `Data not found for URL ${url}`,
       });
     } else {
       sendResponse<"load_data">(baseSendResponse, {
         success: true,
-        data: JSON.parse(data),
+        data: parsedData[url],
       });
     }
   },
 
   save_data: (message, baseSendResponse) => {
     console.log("saving data for Loop Video...");
-    window.localStorage.setItem(
-      LOCALSTORAGE_KEY,
-      JSON.stringify(message.data ?? {}),
+
+    const url = document.URL;
+    let previousData = JSON.parse(
+      window.localStorage.getItem(LOCALSTORAGE_KEY) ?? "null",
     );
+    if (previousData === null || typeof previousData !== "object") {
+      previousData = {};
+    }
+    previousData[url] = message.data;
+
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(previousData));
     sendResponse<"save_data">(baseSendResponse, {
       success: true,
       data: null,
