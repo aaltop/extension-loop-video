@@ -1,5 +1,6 @@
 import { CommandRegistry, CommandUnion } from "@/entrypoints/popup/commands";
 import responseHandlers from "./handlers";
+import logger from "@/src/logger";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -17,7 +18,7 @@ function addMessageHandler() {
       responseHandlers[com](message, baseSendResponse);
     } else {
       const unknownMessage = `Received unknown command ${com}`;
-      console.log(`Loop Video: ${unknownMessage}`);
+      logger.log(unknownMessage);
       sendResponse<"unknown">(baseSendResponse, {
         success: false,
         message: unknownMessage,

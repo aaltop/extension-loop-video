@@ -1,4 +1,5 @@
 import { CommandRegistry, PopupData } from "@/entrypoints/popup/commands";
+import logger from "@/src/logger";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -150,7 +151,7 @@ const _responseHandlers: ResponseRegistry = {
   },
 
   load_data: (message, baseSendResponse) => {
-    console.log("loading data for Loop Video...");
+    logger.log("loading data...");
     const data = storage.getStoredData();
     const url = document.URL;
     if (data === undefined || !data[url]) {
@@ -167,7 +168,7 @@ const _responseHandlers: ResponseRegistry = {
   },
 
   save_data: (message, baseSendResponse) => {
-    console.log("saving data for Loop Video...");
+    logger.log("saving data...");
 
     const url = document.URL;
     let previousData = storage.getStoredData();
@@ -256,7 +257,7 @@ const _responseHandlers: ResponseRegistry = {
             success: true,
             data: null,
           });
-          console.log("Loaded data from file");
+          logger.log("Loaded data from file");
         } else {
           sendResponse<"load_data_from_file">(baseSendResponse, {
             success: false,
@@ -282,7 +283,7 @@ const _responseHandlers: ResponseRegistry = {
   },
 
   log_message: (message, baseSendResponse) => {
-    console.log(`From popup: ${message.data.message}`);
+    logger.log(`From popup: ${message.data.message}`);
     sendResponse<"log_message">(baseSendResponse, {
       success: true,
       data: null,
