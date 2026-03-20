@@ -9,6 +9,7 @@ export type CommandString =
   | "log_message"
   | "save_data"
   | "load_data"
+  | "download_data"
   | "enable_looping"
   | "disable_looping"
   | "element_list_length"
@@ -231,6 +232,22 @@ async function highlightElements(data: HighlightComponentArgs) {
   });
 }
 
+export interface CommandRegistry {
+  download_data: RequestResponsePair<
+    Request<"download_data", null>,
+    Response<{ filename: string }>
+  >;
+}
+/**
+ * Download the data for this domain.
+ */
+async function downloadData() {
+  return await sendToTab<"download_data">({
+    command: "download_data",
+    data: null,
+  });
+}
+
 /**
  * Holds commands used to communicate with a content script.
  */
@@ -243,4 +260,5 @@ export const commands = {
   disableLooping,
   elementListLength,
   highlightElements,
+  downloadData,
 };

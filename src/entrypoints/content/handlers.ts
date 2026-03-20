@@ -1,4 +1,4 @@
-import { CommandRegistry } from "@/entrypoints/popup/commands";
+import { CommandRegistry, PopupData } from "@/entrypoints/popup/commands";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -28,12 +28,33 @@ function getDataAttributeKey(suffix: string) {
 }
 
 /**
- * Get a key used for the extension's localStorage data.
- * @param suffix Descriptive of the nature of the data. For representing
- * hierarchy flatly, values should be delimited by forward slashes (/).
+ * Data storage -related functionality.
  */
-function getStorageKey(suffix: string) {
-  return `${LOCALSTORAGE_KEY}/${suffix}`;
+namespace storage {
+  /**
+   * Get a key used for the extension's localStorage data.
+   * @param suffix Descriptive of the nature of the data. For representing
+   * hierarchy flatly, values should be delimited by forward slashes (/).
+   */
+  function getStorageKey(suffix: string) {
+    return `${LOCALSTORAGE_KEY}/${suffix}`;
+  }
+
+  /**
+   * Whether the parsed stored data is valid.
+   */
+  export function storedDataIsValid(data: any) {
+    return data !== null && typeof data === "object";
+  }
+
+  /**
+   * Get the stored data of the extension for this domain.
+   */
+  export function getStoredData(): Record<string, PopupData> | undefined {
+    const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
+    const parsedData = JSON.parse(data ?? "null");
+    return storedDataIsValid(parsedData) ? parsedData : undefined;
+  }
 }
 
 /**
@@ -117,14 +138,9 @@ const _responseHandlers: ResponseRegistry = {
 
   load_data: (message, baseSendResponse) => {
     console.log("loading data for Loop Video...");
-    const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
-    const parsedData = JSON.parse(data ?? "null");
+    const data = storage.getStoredData();
     const url = document.URL;
-    if (
-      parsedData === null ||
-      typeof parsedData !== "object" ||
-      !parsedData[url]
-    ) {
+    if (data === undefined || !data[url]) {
       sendResponse<"load_data">(baseSendResponse, {
         success: false,
         message: `Data not found for URL ${url}`,
@@ -132,7 +148,7 @@ const _responseHandlers: ResponseRegistry = {
     } else {
       sendResponse<"load_data">(baseSendResponse, {
         success: true,
-        data: parsedData[url],
+        data: data[url],
       });
     }
   },
@@ -141,10 +157,8 @@ const _responseHandlers: ResponseRegistry = {
     console.log("saving data for Loop Video...");
 
     const url = document.URL;
-    let previousData = JSON.parse(
-      window.localStorage.getItem(LOCALSTORAGE_KEY) ?? "null",
-    );
-    if (previousData === null || typeof previousData !== "object") {
+    let previousData = storage.getStoredData();
+    if (previousData === undefined) {
       previousData = {};
     }
     previousData[url] = message.data;
@@ -153,6 +167,45 @@ const _responseHandlers: ResponseRegistry = {
     sendResponse<"save_data">(baseSendResponse, {
       success: true,
       data: null,
+    });
+  },
+
+  download_data: (message, baseSendResponse) => {
+    let data = storage.getStoredData();
+    if (data === undefined) {
+      data = {};
+    }
+
+    const blob = new Blob([JSON.stringify(data)], {
+      type: "application/json",
+    });
+    const objUrl = URL.createObjectURL(blob);
+    const hostname = new URL(document.URL).hostname;
+    const filename = `loop_video_data_${hostname}.json`;
+    try {
+      const link = document.createElement("a");
+      link.href = objUrl;
+
+      link.download = filename;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      if (Error.isError(error)) {
+        sendResponse<"download_data">(baseSendResponse, {
+          success: false,
+          message: `Error while downloading data: ${error.message}`,
+        });
+      }
+    } finally {
+      URL.revokeObjectURL(objUrl);
+    }
+    sendResponse<"download_data">(baseSendResponse, {
+      success: true,
+      data: {
+        filename,
+      },
     });
   },
 

@@ -189,7 +189,21 @@ function App() {
           >
             {intervalId !== null ? "Disable looping" : "Enable looping"}
           </button>
+        </div>
+
+        <div>
           <VideoHighlight />
+        </div>
+        <div>
+          <button
+            type="button"
+            onClick={async () => {
+              const response = await commands.downloadData();
+              handleResponse(response);
+            }}
+          >
+            Download data for current domain
+          </button>
         </div>
       </div>
       <p>{errorMsg}</p>
