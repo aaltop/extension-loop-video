@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { PopupData } from "@/entrypoints/popup/commands";
+import { PopupData } from "@/entrypoints/sidepanel/commands";
 import { ValueState } from "@/src/typing/state";
 
 interface SavedStateAccessor {

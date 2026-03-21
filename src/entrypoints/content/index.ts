@@ -1,4 +1,7 @@
-import { CommandRegistry, CommandUnion } from "@/entrypoints/popup/commands";
+import {
+  CommandRegistry,
+  CommandUnion,
+} from "@/entrypoints/sidepanel/commands";
 import responseHandlers from "./handlers";
 import logger from "@/src/logger";
 

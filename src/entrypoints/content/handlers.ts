@@ -1,4 +1,4 @@
-import { CommandRegistry, PopupData } from "@/entrypoints/popup/commands";
+import { CommandRegistry, PopupData } from "@/entrypoints/sidepanel/commands";
 import logger from "@/src/logger";
 
 function sendResponse<K extends keyof CommandRegistry>(
@@ -283,7 +283,7 @@ const _responseHandlers: ResponseRegistry = {
   },
 
   log_message: (message, baseSendResponse) => {
-    logger.log(`From popup: ${message.data.message}`);
+    logger.log(`From sidebar: ${message.data.message}`);
     sendResponse<"log_message">(baseSendResponse, {
       success: true,
       data: null,
