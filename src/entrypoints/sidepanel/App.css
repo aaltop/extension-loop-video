@@ -2,3 +2,7 @@ button {
   border-radius: 7px;
   border-style: solid;
 }
+
+.error {
+  color: darkred;
+}

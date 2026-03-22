@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 
-import { commands, PopupData } from "./commands";
+import { commands } from "./commands";
 import { Response } from "@/src/typing/commands";
 import {
   useLoopableIndex,
@@ -10,6 +10,7 @@ import {
   useSelectors,
 } from "./SavedStateProvider";
 import { ValueState } from "@/src/typing/state";
+import { ConsoleContext } from "./ConsoleProvider";
 
 function VideoTimeInput({
   videoTime,
@@ -107,9 +108,17 @@ function VideoHighlight() {
   );
 }
 
+function ErrorMessage() {
+  const { log } = useContext(ConsoleContext);
+
+  const latest = log.at(-1);
+
+  return <p className="error">{`${latest ? latest.message : ""}`}</p>;
+}
+
 function App() {
   const [intervalId, setIntervalId] = useState<number | null>(null);
-  const [errorMsg, setErrorMsg] = useState("");
+  const { log, logger } = useContext(ConsoleContext);
   const endpoints = useLoopEnds();
   const popupData = useSavedState();
 
@@ -122,9 +131,7 @@ function App() {
 
   function handleResponse(response: Response<unknown>) {
     if (!response.success) {
-      setErrorMsg(response.message);
-    } else {
-      setErrorMsg("");
+      logger.log(response.message);
     }
   }
 
@@ -217,7 +224,7 @@ function App() {
           </button>
         </div>
       </div>
-      <p>{errorMsg}</p>
+      <ErrorMessage />
     </>
   );
 }
