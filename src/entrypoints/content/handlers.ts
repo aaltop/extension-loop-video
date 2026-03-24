@@ -3,6 +3,7 @@ import {
   ExtensionData,
 } from "@/entrypoints/sidepanel/commands";
 import logger from "@/src/logger";
+import { playSections } from "./skipping";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -86,14 +87,15 @@ const _responseHandlers: ResponseRegistry = {
         message: "Element index out of bounds; check the used selector",
       });
     }
-    const element = elements[message.data.loopableIndex] as HTMLVideoElement;
+    const skippable = elements[message.data.loopableIndex] as HTMLMediaElement;
     const intervalId = window.setInterval(() => {
-      if (!element) return;
-
-      if (element.currentTime >= message.data.timeSections[0].endTime) {
-        element.currentTime = message.data.timeSections[0].startTime;
-      }
-    }, 10);
+      if (!skippable) return;
+      playSections({
+        skippable,
+        timeSections: message.data.timeSections,
+        shouldLoop: true,
+      });
+    }, 20);
 
     sendResponse<"enable_looping">(baseSendResponse, {
       success: true,

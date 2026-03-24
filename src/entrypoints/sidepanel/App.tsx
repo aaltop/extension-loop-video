@@ -9,46 +9,9 @@ import {
   useSavedState,
   useSelectors,
 } from "./SavedStateProvider";
-import { ValueState } from "@/src/typing/state";
 import { ConsoleContext } from "./ConsoleProvider";
 import TimesTable from "./components/TimesTable";
 import { SyncMessage } from "../content/typing";
-
-function VideoTimeInput({
-  videoTime,
-  state,
-}: {
-  videoTime: ValueState<number>;
-  state: {
-    buttonText: string;
-  };
-}) {
-  const loopableIndex = useLoopableIndex();
-  const selectors = useSelectors();
-
-  return (
-    <>
-      <button
-        className="video-time-button"
-        type="button"
-        onClick={async () => {
-          const response = await commands.getVideoTime({
-            loopableIndex: loopableIndex.get(),
-            selectors: selectors.get(),
-          });
-          if (response.success) {
-            videoTime.set(response.data.time);
-          } else {
-            await commands.logMessage(response.message);
-          }
-        }}
-      >
-        {state.buttonText}
-      </button>
-      <span>{videoTime.get().toFixed(3)}</span>
-    </>
-  );
-}
 
 function VideoHighlight() {
   const loopableIndex = useLoopableIndex();
@@ -137,7 +100,7 @@ function App() {
   const [intervalId, setIntervalId] = useState<number | null>(null);
   const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
   const { log, logger } = useContext(ConsoleContext);
-  const endpoints = useLoopEnds();
+  const endpoints = useLoopEnds({ index: 0 });
   const popupData = useSavedState();
 
   useEffect(() => {
@@ -179,22 +142,6 @@ function App() {
       <h1>Loop Video</h1>
       <TimesTable />
       <div>
-        <div>
-          <VideoTimeInput
-            videoTime={endpoints.startTime}
-            state={{
-              buttonText: "Set start time",
-            }}
-          />
-        </div>
-        <div>
-          <VideoTimeInput
-            videoTime={endpoints.endTime}
-            state={{
-              buttonText: "Set end time",
-            }}
-          />
-        </div>
         <button
           onClick={async () => {
             const response = await commands.saveData(popupData.get());

@@ -1,4 +1,11 @@
 import { TimeSection } from "../commands";
+import {
+  useLoopableIndex,
+  useLoopEnds,
+  useSelectors,
+  useTimeSectionControl,
+} from "../SavedStateProvider";
+import { commands } from "../commands";
 
 type Times = TimeSection;
 
@@ -33,8 +40,28 @@ function TimeInput({
   time: number;
   setTime: (time: number) => void;
 }) {
+  const loopableIndex = useLoopableIndex();
+  const selectors = useSelectors();
+
   return (
     <td>
+      <button
+        className="video-time-button"
+        type="button"
+        onClick={async () => {
+          const response = await commands.getVideoTime({
+            loopableIndex: loopableIndex.get(),
+            selectors: selectors.get(),
+          });
+          if (response.success) {
+            setTime(response.data.time);
+          } else {
+            await commands.logMessage(response.message);
+          }
+        }}
+      >
+        Set as current video time
+      </button>
       <input
         type="number"
         value={time}
@@ -46,35 +73,31 @@ function TimeInput({
   );
 }
 
-function TimesTableRow() {
-  const times = useTimes();
+function TimesTableRow({ index }: { index: number }) {
+  const { startTime, endTime } = useLoopEnds({ index });
 
   return (
     <tr>
-      <TimeInput time={times.startTime} setTime={times.setStartTime} />
-      <TimeInput time={times.endTime} setTime={times.setEndTime} />
+      <TimeInput time={startTime.get()} setTime={startTime.set} />
+      <TimeInput time={endTime.get()} setTime={endTime.set} />
     </tr>
   );
 }
 
 export default function TimesTable() {
-  const [numSections, _setNumSections] = useState<number>(1);
+  const { length: timeSectionsLength } = useTimeSectionControl();
 
-  function setNumSections(sections: number) {
-    if (sections < 1) return;
-    _setNumSections(() => sections);
-  }
-
-  const sections = Array.from(new Array(numSections), (_, i) => (
-    <TimesTableRow key={i} />
+  const sections = Array.from(new Array(timeSectionsLength.get()), (_, i) => (
+    <TimesTableRow key={i} index={i} />
   ));
 
   return (
     <>
       <button
         type="button"
+        disabled={timeSectionsLength.get() <= 1}
         onClick={() => {
-          setNumSections(numSections - 1);
+          timeSectionsLength.set(timeSectionsLength.get() - 1);
         }}
       >
         Remove Section
@@ -82,7 +105,7 @@ export default function TimesTable() {
       <button
         type="button"
         onClick={() => {
-          setNumSections(numSections + 1);
+          timeSectionsLength.set(timeSectionsLength.get() + 1);
         }}
       >
         Add Section
