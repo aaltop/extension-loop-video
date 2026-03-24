@@ -1,17 +1,16 @@
 import { createContext } from "react";
-import { PopupData } from "@/entrypoints/sidepanel/commands";
+import { ExtensionData } from "@/entrypoints/sidepanel/commands";
 import { ValueState } from "@/src/typing/state";
 
 interface SavedStateAccessor {
-  state: PopupData;
-  setState: (newState: PopupData) => void;
+  state: ExtensionData;
+  setState: (newState: ExtensionData) => void;
 }
 
-const defaultSavedState: PopupData = {
+const defaultSavedState: ExtensionData = {
   loopableIndex: 0,
   selectors: "video",
-  startTime: 0.0,
-  endTime: 0.0,
+  timeSections: [{ startTime: 0.0, endTime: 0.0 }],
 } as const;
 
 const defaultSavedStateAccessor = {
@@ -28,9 +27,9 @@ const SavedStateContext = createContext<SavedStateAccessor>(
 );
 
 function SavedStateProvider({ children }: { children: React.ReactNode }) {
-  const [state, _setState] = useState<PopupData>(defaultSavedState);
+  const [state, _setState] = useState<ExtensionData>(defaultSavedState);
 
-  function setState(newState: PopupData) {
+  function setState(newState: ExtensionData) {
     _setState(() => newState);
   }
 
@@ -48,24 +47,35 @@ interface Permissions {
 interface ContextHookArgs {}
 type ContextHook<T> = (args?: ContextHookArgs) => ValueState<T>;
 
-interface HookFactoryArgs<T> {
+/**
+ * @template T Returned by the getter, set by the setter.
+ * @template K Key of property in the save data that is needed
+ * for updating this value, if previous data is needed.
+ */
+interface HookFactoryArgs<T, K extends keyof ExtensionData> {
   /**
    * Given the state, returns the relevant value.
    */
-  getFromState: (state: PopupData) => T;
+  getFromState: (state: Pick<ExtensionData, K>) => T;
 
   /**
-   * Given the previous state and a new value, return an updated state.
+   * Given the previous state of a relevant property and a new value for
+   * that property (or some part of it), return an updated property.
    */
-  createNewState: (prevState: PopupData, newValue: T) => PopupData;
+  createNewState: (
+    prevState: Pick<ExtensionData, K>,
+    newValue: T,
+  ) => Pick<ExtensionData, K>;
 }
 
-function hookFactory<T>(args: HookFactoryArgs<T>): ContextHook<T> {
+function hookFactory<T, K extends keyof ExtensionData>(
+  args: HookFactoryArgs<T, K>,
+): ContextHook<T> {
   return function contextHook(hookArgs) {
     const { state, setState } = useContext(SavedStateContext);
     return {
       set(newValue) {
-        setState(args.createNewState(state, newValue));
+        setState({ ...state, ...args.createNewState(state, newValue) });
       },
       get() {
         return args.getFromState(state);
@@ -77,7 +87,9 @@ function hookFactory<T>(args: HookFactoryArgs<T>): ContextHook<T> {
 /**
  * The saved state of the popup.
  */
-export function useSavedState(args?: ContextHookArgs): ValueState<PopupData> {
+export function useSavedState(
+  args?: ContextHookArgs,
+): ValueState<ExtensionData> {
   const { state, setState } = useContext(SavedStateContext);
   return {
     set: setState,
@@ -90,9 +102,9 @@ export function useSavedState(args?: ContextHookArgs): ValueState<PopupData> {
 /**
  * The index of the loopable element.
  */
-export const useLoopableIndex = hookFactory<number>({
+export const useLoopableIndex = hookFactory<number, "loopableIndex">({
   createNewState(prevState, newValue) {
-    return { ...prevState, loopableIndex: newValue };
+    return { loopableIndex: newValue };
   },
   getFromState(state) {
     return state.loopableIndex;
@@ -102,9 +114,9 @@ export const useLoopableIndex = hookFactory<number>({
 /**
  * The selectors used to query for the loopable elements.
  */
-export const useSelectors = hookFactory<string>({
+export const useSelectors = hookFactory<string, "selectors">({
   createNewState(prevState, newValue) {
-    return { ...prevState, selectors: newValue };
+    return { selectors: newValue };
   },
   getFromState(state) {
     return state.selectors;
@@ -114,24 +126,27 @@ export const useSelectors = hookFactory<string>({
 /**
  * The loop startpoint.
  */
-export const useStartTime = hookFactory<number>({
-  createNewState(prevState, newValue) {
-    return { ...prevState, startTime: newValue };
+export const useStartTime = hookFactory<number, "timeSections">({
+  createNewState(prev, startTime) {
+    // TODO: would this be a problem?
+    prev.timeSections[0].startTime = startTime;
+    return prev;
   },
   getFromState(state) {
-    return state.startTime;
+    return state.timeSections[0].startTime;
   },
 });
 
 /**
  * The loop endpoint.
  */
-export const useEndTime = hookFactory<number>({
-  createNewState(prevState, newValue) {
-    return { ...prevState, endTime: newValue };
+export const useEndTime = hookFactory<number, "timeSections">({
+  createNewState(prev, newValue) {
+    prev.timeSections[0].endTime = newValue;
+    return prev;
   },
   getFromState(state) {
-    return state.endTime;
+    return state.timeSections[0].endTime;
   },
 });
 

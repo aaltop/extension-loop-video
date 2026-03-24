@@ -43,17 +43,23 @@ export interface LoopableInfo {
   selectors: string;
 }
 
+interface TimeSection {
+  startTime: number;
+  endTime: number;
+
+  description?: string;
+}
+
 /**
  * Info needed to create a video (or similar) loop.
  */
 export interface LoopInfo extends LoopableInfo {
-  startTime: number;
-  endTime: number;
+  timeSections: TimeSection[];
 }
 /**
- * The data retained by the popup.
+ * The data retained by the extension while active.
  */
-export interface PopupData extends LoopInfo {}
+export interface ExtensionData extends LoopInfo {}
 
 /**
  * Set of request-response pairs representing communication to and from
@@ -131,21 +137,21 @@ async function logMessage(message: string) {
 
 export interface CommandRegistry {
   save_data: RequestResponsePair<
-    Request<"save_data", PopupData>,
+    Request<"save_data", ExtensionData>,
     Response<null>
   >;
 }
 /**
  * Save the passed data.
  */
-async function saveData(data: PopupData) {
+async function saveData(data: ExtensionData) {
   return await sendToTab<"save_data">({ command: "save_data", data });
 }
 
 export interface CommandRegistry {
   load_data: RequestResponsePair<
     Request<"load_data", null>,
-    Response<PopupData>
+    Response<ExtensionData>
   >;
 }
 /**

@@ -1,4 +1,7 @@
-import { CommandRegistry, PopupData } from "@/entrypoints/sidepanel/commands";
+import {
+  CommandRegistry,
+  ExtensionData,
+} from "@/entrypoints/sidepanel/commands";
 import logger from "@/src/logger";
 
 function sendResponse<K extends keyof CommandRegistry>(
@@ -52,7 +55,7 @@ namespace storage {
   /**
    * Get the stored data of the extension for this domain.
    */
-  export function getStoredData(): Record<string, PopupData> | undefined {
+  export function getStoredData(): Record<string, ExtensionData> | undefined {
     const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
     let parsedData = JSON.parse(data ?? "null");
     if (parsedData !== null) {
@@ -87,8 +90,8 @@ const _responseHandlers: ResponseRegistry = {
     const intervalId = window.setInterval(() => {
       if (!element) return;
 
-      if (element.currentTime >= message.data.endTime) {
-        element.currentTime = message.data.startTime;
+      if (element.currentTime >= message.data.timeSections[0].endTime) {
+        element.currentTime = message.data.timeSections[0].startTime;
       }
     }, 10);
 

@@ -146,26 +146,26 @@ function App() {
     execute();
   }, []);
 
-  // useEffect(() => {
-  //   function receiveFromTab(
-  //     _message: any,
-  //     sender: Browser.runtime.MessageSender,
-  //   ) {
-  //     if (sender.tab) {
-  //       const message = _message as SyncMessage;
-  //       if (message?.event) {
-  //         // cause an update of the side panel to occur whenever the
-  //         // tab changes
-  //         setTabChangeCounter((prev) => prev + 1);
-  //       }
-  //     }
-  //   }
+  useEffect(() => {
+    function receiveFromTab(
+      _message: any,
+      sender: Browser.runtime.MessageSender,
+    ) {
+      if (sender.tab) {
+        const message = _message as SyncMessage;
+        if (message?.event) {
+          // cause an update of the side panel to occur whenever the
+          // tab changes
+          setTabChangeCounter((prev) => prev + 1);
+        }
+      }
+    }
 
-  //   browser.runtime.onMessage.addListener(receiveFromTab);
-  //   return () => {
-  //     browser.runtime.onMessage.removeListener(receiveFromTab);
-  //   };
-  // }, []);
+    browser.runtime.onMessage.addListener(receiveFromTab);
+    return () => {
+      browser.runtime.onMessage.removeListener(receiveFromTab);
+    };
+  }, []);
 
   function handleResponse(response: Response<unknown>) {
     if (!response.success) {
@@ -237,7 +237,7 @@ function App() {
         </div>
 
         <div>
-          <VideoHighlight key={tabChangeCounter} />
+          <VideoHighlight />
         </div>
         <div>
           <button
