@@ -219,7 +219,7 @@ interface HighlightComponentArgs extends Pick<LoopableInfo, "selectors"> {
 export interface CommandRegistry {
   highlight_elements: RequestResponsePair<
     Request<"highlight_elements", HighlightComponentArgs>,
-    Response<null>
+    Response<{ invalidIndices: number[] }>
   >;
 }
 /**

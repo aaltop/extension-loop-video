@@ -107,11 +107,15 @@ const _responseHandlers: ResponseRegistry = {
   },
 
   highlight_elements: (message, baseSendResponse) => {
+    const invalidIndices: number[] = [];
     try {
       const elems = document.querySelectorAll(message.data.selectors);
 
       for (const idx of message.data.indices) {
-        if (elems.length <= idx || idx < 0) continue;
+        if (elems.length <= idx || idx < 0) {
+          invalidIndices.push(idx);
+          continue;
+        }
 
         // just assume HTMLElement
         const htmlElem = elems[idx] as HTMLElement;
@@ -138,7 +142,7 @@ const _responseHandlers: ResponseRegistry = {
     }
     sendResponse<"highlight_elements">(baseSendResponse, {
       success: true,
-      data: null,
+      data: { invalidIndices },
     });
   },
 

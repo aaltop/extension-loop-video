@@ -4,6 +4,7 @@ import {
 } from "@/entrypoints/sidepanel/commands";
 import responseHandlers from "./handlers";
 import logger from "@/src/logger";
+import { SyncMessage } from "./typing";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -34,5 +35,16 @@ export default defineContentScript({
   matches: ["<all_urls>"],
   main() {
     addMessageHandler();
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        const message: SyncMessage = {
+          event: "visibilitychange",
+        };
+        browser.runtime.sendMessage(message);
+      }
+    });
+
+    const message: SyncMessage = { event: "loaded" };
+    browser.runtime.sendMessage(message);
   },
 });

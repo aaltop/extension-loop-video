@@ -11,6 +11,7 @@ import {
 } from "./SavedStateProvider";
 import { ValueState } from "@/src/typing/state";
 import { ConsoleContext } from "./ConsoleProvider";
+import { SyncMessage } from "../content/typing";
 
 function VideoTimeInput({
   videoTime,
@@ -51,10 +52,14 @@ function VideoTimeInput({
 function VideoHighlight() {
   const loopableIndex = useLoopableIndex();
   const selectors = useSelectors();
-  const [elemNum, setElemNum] = useState<number | null>(null);
+  const { logger } = useContext(ConsoleContext);
+  const [elemNum, setElemNum] = useState<number>(0);
 
   useEffect(() => {
-    queryAndSetElemNum();
+    async function execute() {
+      await queryAndSetElemNum();
+    }
+    execute();
   }, []);
 
   async function getElementListLength(selectors: string) {
@@ -67,16 +72,17 @@ function VideoHighlight() {
   }
 
   async function queryAndSetElemNum() {
-    const len = await getElementListLength(selectors.get());
-    setElemNum(() => len ?? null);
+    const len = (await getElementListLength(selectors.get())) ?? 0;
+    setElemNum(() => len);
+    return len;
   }
 
   async function addToIndex(val: number) {
     await queryAndSetElemNum();
-    const prev = loopableIndex.get();
     if (elemNum === 0 || elemNum === null) {
       return;
     }
+    const prev = loopableIndex.get();
 
     let newIndex = prev + val;
     newIndex = (elemNum + (newIndex % elemNum)) % elemNum;
@@ -97,6 +103,12 @@ function VideoHighlight() {
             selectors: selectors.get(),
             indices,
           });
+          // if (response.success && response.data.invalidIndices.length > 0) {
+          //   const indicesString = JSON.stringify(response.data.invalidIndices);
+          //   logger.log(
+          //     JSON.stringify(`Invalid highlight indices: ${indicesString}`),
+          //   );
+          // }
         }}
       >
         {`Highlight video ${loopableIndex.get() + 1} out of ${elemNum ?? "none"}`}
@@ -113,11 +125,16 @@ function ErrorMessage() {
 
   const latest = log.at(-1);
 
-  return <p className="error">{`${latest ? latest.message : ""}`}</p>;
+  const message = latest
+    ? `${latest.datetime.toISOString()} ${latest.message}`
+    : "";
+
+  return <p className="error">{message}</p>;
 }
 
 function App() {
   const [intervalId, setIntervalId] = useState<number | null>(null);
+  const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
   const { log, logger } = useContext(ConsoleContext);
   const endpoints = useLoopEnds();
   const popupData = useSavedState();
@@ -128,6 +145,27 @@ function App() {
     }
     execute();
   }, []);
+
+  // useEffect(() => {
+  //   function receiveFromTab(
+  //     _message: any,
+  //     sender: Browser.runtime.MessageSender,
+  //   ) {
+  //     if (sender.tab) {
+  //       const message = _message as SyncMessage;
+  //       if (message?.event) {
+  //         // cause an update of the side panel to occur whenever the
+  //         // tab changes
+  //         setTabChangeCounter((prev) => prev + 1);
+  //       }
+  //     }
+  //   }
+
+  //   browser.runtime.onMessage.addListener(receiveFromTab);
+  //   return () => {
+  //     browser.runtime.onMessage.removeListener(receiveFromTab);
+  //   };
+  // }, []);
 
   function handleResponse(response: Response<unknown>) {
     if (!response.success) {
@@ -199,7 +237,7 @@ function App() {
         </div>
 
         <div>
-          <VideoHighlight />
+          <VideoHighlight key={tabChangeCounter} />
         </div>
         <div>
           <button
