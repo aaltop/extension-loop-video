@@ -6,3 +6,11 @@ button {
 .error {
   color: darkred;
 }
+
+table, th, td {
+  border: 1px solid grey;
+}
+
+table input {
+  max-width: 7rem;
+}

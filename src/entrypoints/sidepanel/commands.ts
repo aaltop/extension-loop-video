@@ -43,7 +43,7 @@ export interface LoopableInfo {
   selectors: string;
 }
 
-interface TimeSection {
+export interface TimeSection {
   startTime: number;
   endTime: number;
 

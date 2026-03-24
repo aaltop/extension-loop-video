@@ -11,6 +11,7 @@ import {
 } from "./SavedStateProvider";
 import { ValueState } from "@/src/typing/state";
 import { ConsoleContext } from "./ConsoleProvider";
+import TimesTable from "./components/TimesTable";
 import { SyncMessage } from "../content/typing";
 
 function VideoTimeInput({
@@ -176,6 +177,7 @@ function App() {
   return (
     <>
       <h1>Loop Video</h1>
+      <TimesTable />
       <div>
         <div>
           <VideoTimeInput
