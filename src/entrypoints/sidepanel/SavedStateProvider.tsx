@@ -1,13 +1,13 @@
 import { createContext } from "react";
-import { ExtensionData } from "@/entrypoints/sidepanel/commands";
+import { URLData } from "@/entrypoints/sidepanel/commands";
 import { ValueState } from "@/src/typing/state";
 
 interface SavedStateAccessor {
-  state: ExtensionData;
-  setState: (newState: ExtensionData) => void;
+  state: URLData;
+  setState: (newState: URLData) => void;
 }
 
-function createDefaultSavedState(): ExtensionData {
+function createDefaultSavedState(): URLData {
   return {
     loopableIndex: -1,
     selectors: "video",
@@ -29,9 +29,9 @@ const SavedStateContext = createContext<SavedStateAccessor>(
 );
 
 function SavedStateProvider({ children }: { children: React.ReactNode }) {
-  const [state, _setState] = useState<ExtensionData>(createDefaultSavedState);
+  const [state, _setState] = useState<URLData>(createDefaultSavedState);
 
-  function setState(newState: ExtensionData) {
+  function setState(newState: URLData) {
     _setState(() => newState);
   }
 
@@ -74,7 +74,7 @@ type ContextHook<T, E extends object = object> = ({
  */
 interface HookFactoryArgs<
   T,
-  K extends keyof ExtensionData,
+  K extends keyof URLData,
   E extends object = object,
 > {
   /**
@@ -82,7 +82,7 @@ interface HookFactoryArgs<
    * @param state The state.
    * @param hookArgs Arguments passed to the hook during its creation.
    */
-  getFromState: (state: Pick<ExtensionData, K>, hookArgs: E) => T;
+  getFromState: (state: Pick<URLData, K>, hookArgs: E) => T;
 
   /**
    * Given the previous state of a relevant property and a new value for
@@ -92,10 +92,10 @@ interface HookFactoryArgs<
    * @param hookArgs Arguments passed to the hook during its creation.
    */
   createNewState: (
-    prevState: Pick<ExtensionData, K>,
+    prevState: Pick<URLData, K>,
     newValue: T,
     hookArgs: E,
-  ) => Pick<ExtensionData, K>;
+  ) => Pick<URLData, K>;
 }
 
 /**
@@ -105,11 +105,9 @@ interface HookFactoryArgs<
  * the key of the property that is relevant for this hook.
  * @template E Arguments needed for the hook itself.
  */
-function hookFactory<
-  T,
-  K extends keyof ExtensionData,
-  E extends object = object,
->(args: HookFactoryArgs<T, K, E>): ContextHook<T, E> {
+function hookFactory<T, K extends keyof URLData, E extends object = object>(
+  args: HookFactoryArgs<T, K, E>,
+): ContextHook<T, E> {
   return function contextHook(contextHookArgs) {
     const { state, setState } = useContext(SavedStateContext);
 
@@ -135,9 +133,7 @@ function hookFactory<
 /**
  * The saved state of the popup.
  */
-export function useSavedState(
-  args?: ContextHookArgs,
-): ValueState<ExtensionData> {
+export function useSavedState(args?: ContextHookArgs): ValueState<URLData> {
   const { state, setState } = useContext(SavedStateContext);
   return {
     set: setState,
@@ -257,10 +253,7 @@ export const useTimeSectionDisable = hookFactory<
   },
 });
 
-const _useTimeSection = hookFactory<
-  ExtensionData["timeSections"],
-  "timeSections"
->({
+const _useTimeSection = hookFactory<URLData["timeSections"], "timeSections">({
   getFromState(state, hookArgs) {
     return state.timeSections;
   },

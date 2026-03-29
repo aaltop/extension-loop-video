@@ -1,7 +1,4 @@
-import {
-  CommandRegistry,
-  ExtensionData,
-} from "@/entrypoints/sidepanel/commands";
+import { CommandRegistry, URLData } from "@/entrypoints/sidepanel/commands";
 import logger from "@/src/logger";
 import { playSections } from "./skipping";
 
@@ -56,7 +53,7 @@ namespace storage {
   /**
    * Get the stored data of the extension for this domain.
    */
-  export function getStoredData(): Record<string, ExtensionData> | undefined {
+  export function getStoredData(): Record<string, URLData> | undefined {
     const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
     let parsedData = JSON.parse(data ?? "null");
     if (parsedData !== null) {

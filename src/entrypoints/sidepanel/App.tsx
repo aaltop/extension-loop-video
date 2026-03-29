@@ -115,7 +115,6 @@ function App() {
   const [intervalId, setIntervalId] = useState<number | null>(null);
   const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
   const { log, logger } = useContext(ConsoleContext);
-  const endpoints = useLoopEnds({ index: 0 });
   const popupData = useSavedState();
 
   useEffect(() => {
