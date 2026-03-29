@@ -35,22 +35,34 @@ function VideoHighlight() {
     }
   }
 
+  /**
+   * Queries and sets the number of elements matching the current
+   * selectors value.
+   * @returns the new elemNum value.
+   */
   async function queryAndSetElemNum() {
     const len = (await getElementListLength(selectors.get())) ?? 0;
     setElemNum(() => len);
     return len;
   }
 
+  /**
+   * Add `val` to the loopableIndex. This updates the state to be current
+   * before the update.
+   * @returns the new index.
+   */
   async function addToIndex(val: number) {
-    await queryAndSetElemNum();
-    if (elemNum === 0 || elemNum === null) {
-      return;
+    const newElemNum = await queryAndSetElemNum();
+    if (newElemNum === 0 || newElemNum === null) {
+      loopableIndex.set(-1);
+      return -1;
     }
     const prev = loopableIndex.get();
 
     let newIndex = prev + val;
-    newIndex = (elemNum + (newIndex % elemNum)) % elemNum;
+    newIndex = (newElemNum + (newIndex % newElemNum)) % newElemNum;
     loopableIndex.set(newIndex);
+    return newIndex;
   }
 
   return (
@@ -61,8 +73,11 @@ function VideoHighlight() {
       <button
         type="button"
         onClick={async () => {
-          queryAndSetElemNum();
-          const indices = [loopableIndex.get()];
+          // this addToIndex call is here mostly to keep the values
+          // up to date if something changes on the page.
+          const newLoopableIndex = await addToIndex(0);
+          if (newLoopableIndex < 0) return;
+          const indices = [newLoopableIndex];
           const response = await commands.highlightElements({
             selectors: selectors.get(),
             indices,

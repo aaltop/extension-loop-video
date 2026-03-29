@@ -9,7 +9,7 @@ interface SavedStateAccessor {
 
 function createDefaultSavedState(): ExtensionData {
   return {
-    loopableIndex: 0,
+    loopableIndex: -1,
     selectors: "video",
     timeSections: [{ startTime: 0.0, endTime: 0.0 }],
   };
