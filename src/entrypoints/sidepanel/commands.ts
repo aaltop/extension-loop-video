@@ -9,6 +9,7 @@ export type CommandString =
   | "log_message"
   | "save_data"
   | "load_data"
+  | "load_domain_data"
   | "download_data"
   | "load_data_from_file"
   | "enable_looping"
@@ -61,10 +62,37 @@ export interface TimeSection {
 export interface LoopInfo extends LoopableInfo {
   timeSections: TimeSection[];
 }
+
+/**
+ * Metadata related to a specific URL.
+ */
+export interface URLMetaData {
+  /**
+   * A short description of the URL.
+   */
+  title?: string;
+  /**
+   * A longer description of the URL.
+   */
+  description?: string;
+  /**
+   * Tags for the URL.
+   */
+  tags?: string[];
+}
+
 /**
  * The data related to a specific URL.
  */
-export interface URLData extends LoopInfo {}
+export interface URLData extends LoopInfo, URLMetaData {}
+
+/**
+ * Key under which the looping data is stored for the domain.
+ */
+export const LOOPING_DATA_KEY = "loopingData" as const;
+export interface DomainData {
+  loopingData: Record<string, URLData>;
+}
 
 /**
  * Set of request-response pairs representing communication to and from
@@ -154,10 +182,24 @@ export interface CommandRegistry {
   load_data: RequestResponsePair<Request<"load_data", null>, Response<URLData>>;
 }
 /**
- * Load popup data.
+ * Load data for the current URL.
  */
 async function loadData() {
   return await sendToTab<"load_data">({ command: "load_data", data: null });
+}
+
+export interface CommandRegistry {
+  load_domain_data: RequestResponsePair<
+    Request<"load_domain_data", null>,
+    Response<DomainData>
+  >;
+}
+
+async function loadDomainData() {
+  return await sendToTab<"load_domain_data">({
+    command: "load_domain_data",
+    data: null,
+  });
 }
 
 interface IntervalIdData {
@@ -279,6 +321,7 @@ export const commands = {
   logMessage,
   saveData,
   loadData,
+  loadDomainData,
   enableLooping,
   disableLooping,
   elementListLength,

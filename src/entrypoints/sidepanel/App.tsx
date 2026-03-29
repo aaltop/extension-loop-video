@@ -5,13 +5,14 @@ import { commands } from "./commands";
 import { Response } from "@/src/typing/commands";
 import {
   useLoopableIndex,
-  useLoopEnds,
   useSavedState,
   useSelectors,
-} from "./SavedStateProvider";
+} from "./SavedStateContext";
 import { ConsoleContext } from "./ConsoleProvider";
 import TimesTable from "./components/TimesTable";
 import { SyncMessage } from "../content/typing";
+import DomainDataView from "./components/DomainDataView";
+import MetaDataHandler from "./components/Metadata";
 
 function VideoHighlight() {
   const loopableIndex = useLoopableIndex();
@@ -108,7 +109,20 @@ function ErrorMessage() {
     ? `${latest.datetime.toISOString()} ${latest.message}`
     : "";
 
-  return <p className="error">{message}</p>;
+  return (
+    <>
+      {log.slice(-5).map((msg, i) => {
+        const message = msg
+          ? `${msg.datetime.toISOString()} ${msg.message}`
+          : "";
+        return (
+          <p key={i} className="error">
+            {message}
+          </p>
+        );
+      })}
+    </>
+  );
 }
 
 function App() {
@@ -152,8 +166,18 @@ function App() {
   }
 
   return (
-    <>
+    <div key={tabChangeCounter}>
+      <button
+        type="button"
+        onClick={() => {
+          popupData.reset();
+          setTabChangeCounter((prev) => prev + 1);
+        }}
+      >
+        Reset state (reload)
+      </button>
       <h1>Loop Video</h1>
+      <MetaDataHandler />
       <TimesTable />
       <div>
         <button
@@ -225,8 +249,16 @@ function App() {
           </button>
         </div>
       </div>
-      <ErrorMessage />
-    </>
+      <details>
+        <summary>Console</summary>
+        <ErrorMessage />
+      </details>
+      <hr />
+      <details>
+        <summary>Domain data</summary>
+        <DomainDataView />
+      </details>
+    </div>
   );
 }
 

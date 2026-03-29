@@ -1,6 +1,11 @@
-import { CommandRegistry, URLData } from "@/entrypoints/sidepanel/commands";
+import {
+  CommandRegistry,
+  DomainData,
+  URLData,
+} from "@/entrypoints/sidepanel/commands";
 import logger from "@/src/logger";
 import { playSections } from "./skipping";
+import { LOOPING_DATA_KEY } from "@/entrypoints/sidepanel/commands";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -48,27 +53,30 @@ namespace storage {
   export function storedDataIsValid(data: any) {
     return data !== null && typeof data === "object";
   }
-
-  const LOOPING_DATA_KEY = "looping_data" as const;
   /**
    * Get the stored data of the extension for this domain.
    */
-  export function getStoredData(): Record<string, URLData> | undefined {
+  export function getStoredData(): DomainData | undefined {
     const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
     let parsedData = JSON.parse(data ?? "null");
-    if (parsedData !== null) {
-      parsedData = parsedData[LOOPING_DATA_KEY];
-    }
     return storedDataIsValid(parsedData) ? parsedData : undefined;
   }
 
   /**
-   * Set the stored data.
+   * Get the stored data for the current URL.
    */
-  export function setStoredData(data: Record<string, unknown>) {
+  export function getStoredURLData(url: string): URLData | undefined {
+    const data = getStoredData();
+    return data?.loopingData[url];
+  }
+
+  /**
+   * Set the stored data for this domain.
+   */
+  export function setStoredData(data: DomainData) {
     const allData: Record<string, unknown> = {};
     allData[LOOPING_DATA_KEY] = data;
-    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(allData));
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
   }
 }
 
@@ -158,9 +166,9 @@ const _responseHandlers: ResponseRegistry = {
 
   load_data: (message, baseSendResponse) => {
     logger.log("loading data...");
-    const data = storage.getStoredData();
     const url = document.URL;
-    if (data === undefined || !data[url]) {
+    let data = storage.getStoredURLData(url);
+    if (data === undefined) {
       sendResponse<"load_data">(baseSendResponse, {
         success: false,
         message: `Data not found for URL ${url}`,
@@ -168,7 +176,22 @@ const _responseHandlers: ResponseRegistry = {
     } else {
       sendResponse<"load_data">(baseSendResponse, {
         success: true,
-        data: data[url],
+        data,
+      });
+    }
+  },
+
+  load_domain_data: (message, baseSendresponse) => {
+    const data = storage.getStoredData();
+    if (data === undefined) {
+      sendResponse<"load_domain_data">(baseSendresponse, {
+        success: false,
+        message: "Data not found for current domain",
+      });
+    } else {
+      sendResponse<"load_domain_data">(baseSendresponse, {
+        success: true,
+        data: data,
       });
     }
   },
@@ -179,9 +202,9 @@ const _responseHandlers: ResponseRegistry = {
     const url = document.URL;
     let previousData = storage.getStoredData();
     if (previousData === undefined) {
-      previousData = {};
+      previousData = { loopingData: {} };
     }
-    previousData[url] = message.data;
+    previousData.loopingData[url] = message.data;
 
     storage.setStoredData(previousData);
     sendResponse<"save_data">(baseSendResponse, {
@@ -193,7 +216,7 @@ const _responseHandlers: ResponseRegistry = {
   download_data: (message, baseSendResponse) => {
     let data = storage.getStoredData();
     if (data === undefined) {
-      data = {};
+      data = { loopingData: {} };
     }
 
     const blob = new Blob([JSON.stringify(data)], {

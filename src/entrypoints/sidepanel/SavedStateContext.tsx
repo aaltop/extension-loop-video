@@ -28,7 +28,11 @@ const SavedStateContext = createContext<SavedStateAccessor>(
   defaultSavedStateAccessor,
 );
 
-function SavedStateProvider({ children }: { children: React.ReactNode }) {
+export function SavedStateProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [state, _setState] = useState<URLData>(createDefaultSavedState);
 
   function setState(newState: URLData) {
@@ -131,14 +135,19 @@ function hookFactory<T, K extends keyof URLData, E extends object = object>(
 }
 
 /**
- * The saved state of the popup.
+ * The saved state of the extension for the current URL.
  */
-export function useSavedState(args?: ContextHookArgs): ValueState<URLData> {
+export function useSavedState(
+  args?: ContextHookArgs,
+): ValueState<URLData> & { reset: () => void } {
   const { state, setState } = useContext(SavedStateContext);
   return {
     set: setState,
     get() {
       return state;
+    },
+    reset() {
+      setState(createDefaultSavedState());
     },
   };
 }
@@ -330,4 +339,59 @@ export function useTimeSectionControl(): {
   };
 }
 
-export default SavedStateProvider;
+const _useTitle = hookFactory<URLData["title"], "title">({
+  getFromState(state, hookArgs) {
+    return state.title;
+  },
+  createNewState(prevState, newValue, hookArgs) {
+    return {
+      ...prevState,
+      title: newValue,
+    };
+  },
+});
+
+/**
+ * The title of the current URL.
+ */
+export function useTitle() {
+  return _useTitle({ args: {} });
+}
+
+const _useDescription = hookFactory<URLData["description"], "description">({
+  getFromState(state, hookArgs) {
+    return state.description;
+  },
+  createNewState(prevState, newValue, hookArgs) {
+    return {
+      ...prevState,
+      description: newValue,
+    };
+  },
+});
+
+/**
+ * The description of the current URL.
+ */
+export function useDescription() {
+  return _useDescription({ args: {} });
+}
+
+const _useTags = hookFactory<Set<string>, "tags">({
+  getFromState(state, hookArgs) {
+    return new Set(state.tags);
+  },
+  createNewState(prevState, newValue, hookArgs) {
+    return {
+      ...prevState,
+      tags: [...newValue],
+    };
+  },
+});
+
+/**
+ * Tags for the current URL.
+ */
+export function useTags() {
+  return _useTags({ args: {} });
+}

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 
 import App from "./App";
 import "./style.css";
-import SavedStateProvider from "./SavedStateProvider";
+import { SavedStateProvider } from "./SavedStateContext";
 import ConsoleContextProvider from "./ConsoleProvider";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

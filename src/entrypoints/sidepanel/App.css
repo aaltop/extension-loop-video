@@ -3,6 +3,10 @@ button {
   border-style: solid;
 }
 
+body {
+  padding: 1rem;
+}
+
 .error {
   color: darkred;
 }
@@ -13,4 +17,29 @@ table, th, td {
 
 table input {
   max-width: 7rem;
+}
+
+label > input {
+  margin-inline-start: 0.5rem;
+}
+
+.metadata-input {
+  margin-block-end: 1.0rem;
+}
+
+.metadata-handler {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+#url-title {
+  display: inline;
+  margin: 0.5rem;
+}
+
+#description-input {
+  max-width: 100%;
+  min-width: 100%;
+  min-height: 5rem;
 }
