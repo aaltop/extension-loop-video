@@ -42,8 +42,9 @@ function relationToTimeSection({
  * - "continue": do nothing as current time is valid.
  * - "skip": skip to next section.
  * - "loop": loop back to the beginning.
+ * - "stop": stop playing.
  */
-type SkipOperation = "continue" | "skip" | "loop";
+type SkipOperation = "continue" | "skip" | "loop" | "stop";
 interface ValidTimeInfo {
   newTime: number;
   operation: SkipOperation;
@@ -61,7 +62,13 @@ function getValidTime({
   timeSections: TimeSection[];
 }): ValidTimeInfo {
   let relation: TimeRelation;
+
+  let allDisabled = true;
   for (const timeSection of timeSections) {
+    if (timeSection.disabled) continue;
+
+    allDisabled = false;
+
     relation = relationToTimeSection({ time, timeSection });
     if (relation === "before") {
       return {
@@ -76,6 +83,14 @@ function getValidTime({
       };
     }
   }
+
+  if (allDisabled) {
+    return {
+      newTime: time,
+      operation: "stop",
+    };
+  }
+
   // if the time is after all the timeSections, loop back to the first
   // timeSection.
   return {
@@ -107,7 +122,7 @@ export function playSections({
     return;
   }
 
-  if (operation === "loop" && !shouldLoop) {
+  if ((operation === "loop" && !shouldLoop) || operation === "stop") {
     skippable.pause();
   }
 

@@ -240,6 +240,23 @@ export function useLoopEnds({
   return { startTime: startTime, endTime: endTime };
 }
 
+/**
+ * Access the state of disablement of a time section.
+ */
+export const useTimeSectionDisable = hookFactory<
+  boolean,
+  "timeSections",
+  TimeSectionArgs
+>({
+  createNewState(prevState, newValue, hookArgs) {
+    prevState.timeSections[hookArgs.index].disabled = newValue;
+    return prevState;
+  },
+  getFromState(state, hookArgs) {
+    return !!state.timeSections[hookArgs.index].disabled;
+  },
+});
+
 const _useTimeSection = hookFactory<
   ExtensionData["timeSections"],
   "timeSections"
@@ -256,7 +273,10 @@ function useTimeSection() {
   return _useTimeSection({ args: {} });
 }
 
-export function useTimeSectionControl(): { length: ValueState<number> } {
+export function useTimeSectionControl(): {
+  length: ValueState<number>;
+  setAllDisabled: (disabled: boolean) => void;
+} {
   const timeSection = useTimeSection();
 
   /**
@@ -294,11 +314,26 @@ export function useTimeSectionControl(): { length: ValueState<number> } {
     timeSection.set(current);
   }
 
+  /**
+   * Set the state of disablement for all time sections.
+   */
+  function setAllDisabled(disabled: boolean) {
+    timeSection.set(
+      timeSection.get().map((section) => {
+        return {
+          ...section,
+          disabled,
+        };
+      }),
+    );
+  }
+
   return {
     length: {
       get: getLength,
       set: setLength,
     },
+    setAllDisabled,
   };
 }
 

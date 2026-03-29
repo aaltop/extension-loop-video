@@ -4,6 +4,7 @@ import {
   useLoopEnds,
   useSelectors,
   useTimeSectionControl,
+  useTimeSectionDisable,
 } from "../SavedStateProvider";
 import { commands } from "../commands";
 
@@ -75,9 +76,15 @@ function TimeInput({
 
 function TimesTableRow({ index }: { index: number }) {
   const { startTime, endTime } = useLoopEnds({ index });
+  const disabled = useTimeSectionDisable({ args: { index } });
 
   return (
     <tr>
+      <td>
+        <button type="button" onClick={() => disabled.set(!disabled.get())}>
+          {disabled.get() ? "Enable" : "Disable"}
+        </button>
+      </td>
       <TimeInput time={startTime.get()} setTime={startTime.set} />
       <TimeInput time={endTime.get()} setTime={endTime.set} />
     </tr>
@@ -85,7 +92,9 @@ function TimesTableRow({ index }: { index: number }) {
 }
 
 export default function TimesTable() {
-  const { length: timeSectionsLength } = useTimeSectionControl();
+  const { length: timeSectionsLength, setAllDisabled } =
+    useTimeSectionControl();
+  const [prevAllDisabled, setPrevAllDisabled] = useState<boolean>(false);
 
   const sections = Array.from(new Array(timeSectionsLength.get()), (_, i) => (
     <TimesTableRow key={i} index={i} />
@@ -93,6 +102,15 @@ export default function TimesTable() {
 
   return (
     <>
+      <button
+        type="button"
+        onClick={() => {
+          setAllDisabled(!prevAllDisabled);
+          setPrevAllDisabled(!prevAllDisabled);
+        }}
+      >
+        {prevAllDisabled ? "Enable all" : "Disable All"}
+      </button>
       <button
         type="button"
         disabled={timeSectionsLength.get() <= 1}
@@ -113,6 +131,7 @@ export default function TimesTable() {
       <table>
         <thead>
           <tr>
+            <th scope="col">Disable/Enable Section</th>
             <th scope="col">Start Time</th>
             <th scope="col">End Time</th>
           </tr>

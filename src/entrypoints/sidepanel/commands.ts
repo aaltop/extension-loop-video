@@ -47,6 +47,11 @@ export interface TimeSection {
   startTime: number;
   endTime: number;
 
+  /**
+   * Whether this timeSection should be considered when doing an operation
+   * based on it.
+   */
+  disabled?: boolean;
   description?: string;
 }
 
