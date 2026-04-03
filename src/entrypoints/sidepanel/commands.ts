@@ -16,6 +16,7 @@ export type CommandString =
   | "disable_looping"
   | "element_list_length"
   | "highlight_elements"
+  | "get_loop_ids"
   | "unknown";
 
 /**
@@ -224,17 +225,17 @@ async function enableLooping(loopInfo: LoopInfo) {
 
 export interface CommandRegistry {
   disable_looping: RequestResponsePair<
-    Request<"disable_looping", IntervalIdData>,
+    Request<"disable_looping", null>,
     Response<null>
   >;
 }
 /**
  * Stop looping a video.
  */
-async function disableLooping(intervalId: number) {
+async function disableLooping() {
   return await sendToTab<"disable_looping">({
     command: "disable_looping",
-    data: { intervalId },
+    data: null,
   });
 }
 
@@ -313,6 +314,23 @@ async function loadDataFromFile() {
   });
 }
 
+export interface CommandRegistry {
+  get_loop_ids: RequestResponsePair<
+    Request<"get_loop_ids", null>,
+    Response<{ loopIds: number[] }>
+  >;
+}
+
+/**
+ * Get the current loop interval ids.
+ */
+async function getLoopIds() {
+  return await sendToTab<"get_loop_ids">({
+    command: "get_loop_ids",
+    data: null,
+  });
+}
+
 /**
  * Holds commands used to communicate with a content script.
  */
@@ -324,6 +342,7 @@ export const commands = {
   loadDomainData,
   enableLooping,
   disableLooping,
+  getLoopIds,
   elementListLength,
   highlightElements,
   downloadData,

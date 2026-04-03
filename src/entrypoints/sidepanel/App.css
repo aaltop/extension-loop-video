@@ -16,7 +16,7 @@ table, th, td {
 }
 
 table input {
-  max-width: 7rem;
+  max-inline-size: 7rem;
 }
 
 label > input {
@@ -39,7 +39,17 @@ label > input {
 }
 
 #description-input {
-  max-width: 100%;
-  min-width: 100%;
-  min-height: 5rem;
+  max-inline-size: 100%;
+  min-inline-size: 100%;
+  min-block-size: 5rem;
+}
+
+details {
+  border: 1px solid black;
+}
+  
+summary {
+  padding-inline: 0.5rem;
+  padding-block: 0.5rem;
+  cursor: pointer;
 }

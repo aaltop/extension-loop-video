@@ -126,7 +126,9 @@ function ErrorMessage() {
 }
 
 function App() {
-  const [intervalId, setIntervalId] = useState<number | null>(null);
+  // why array? Thinking ahead to the possibility of having multiple loops
+  // active at once, though perhaps not so likely to be implemented.
+  const [intervalIds, setIntervalIds] = useState<number[]>([]);
   const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
   const { log, logger } = useContext(ConsoleContext);
   const popupData = useSavedState();
@@ -139,20 +141,27 @@ function App() {
   }, []);
 
   useEffect(() => {
-    function receiveFromTab(
+    async function init() {
+      const response = await commands.getLoopIds();
+      handleResponse(response);
+      if (response.success) {
+        setIntervalIds(() => response.data.loopIds);
+      }
+    }
+
+    async function receiveFromTab(
       _message: any,
       sender: Browser.runtime.MessageSender,
     ) {
       if (sender.tab) {
         const message = _message as SyncMessage;
         if (message?.event) {
-          // cause an update of the side panel to occur whenever the
-          // tab changes
-          setTabChangeCounter((prev) => prev + 1);
+          init();
         }
       }
     }
 
+    init();
     browser.runtime.onMessage.addListener(receiveFromTab);
     return () => {
       browser.runtime.onMessage.removeListener(receiveFromTab);
@@ -177,7 +186,10 @@ function App() {
         Reset state (reload)
       </button>
       <h1>Loop Video</h1>
-      <MetaDataHandler />
+      <details>
+        <summary>Metadata</summary>
+        <MetaDataHandler />
+      </details>
       <TimesTable />
       <div>
         <button
@@ -206,20 +218,22 @@ function App() {
           <button
             type="button"
             onClick={async () => {
-              if (intervalId !== null) {
-                const response = await commands.disableLooping(intervalId);
+              if (intervalIds.length > 0) {
+                const response = await commands.disableLooping();
                 handleResponse(response);
-                setIntervalId(() => null);
+                setIntervalIds(() => []);
               } else {
                 const response = await commands.enableLooping(popupData.get());
                 handleResponse(response);
                 if (response.success) {
-                  setIntervalId(() => response.data.intervalId);
+                  setIntervalIds((prev) => {
+                    return [...prev, response.data.intervalId];
+                  });
                 }
               }
             }}
           >
-            {intervalId !== null ? "Disable looping" : "Enable looping"}
+            {intervalIds.length > 0 ? "Disable looping" : "Enable looping"}
           </button>
         </div>
 

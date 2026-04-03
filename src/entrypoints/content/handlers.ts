@@ -81,6 +81,126 @@ namespace storage {
 }
 
 /**
+ * Manipulation of an HTML element meant to store data in the document.
+ */
+class DataElementHandler {
+  #elementId = "extension-loopvideo" as const;
+
+  /**
+   * Creates and returns the element if it does not exist, otherwise returns
+   * the already existing element.
+   */
+  get element(): HTMLElement {
+    const possiblyExistingElement: HTMLElement | null = document.getElementById(
+      this.#elementId,
+    );
+    if (possiblyExistingElement !== null) {
+      return possiblyExistingElement;
+    } else {
+      const element: HTMLElement = document.createElement("span");
+      element.id = this.#elementId;
+      element.style.display = "none";
+      document.body.appendChild(element);
+      return element;
+    }
+  }
+
+  setData({
+    dataAttributeSuffix,
+    data,
+  }: {
+    /**
+     * A suffix for a data attribute.
+     */
+    dataAttributeSuffix: string;
+    data: string;
+  }) {
+    this.element.setAttribute(getDataAttributeKey(dataAttributeSuffix), data);
+  }
+
+  removeData({
+    dataAttributeSuffix,
+  }: {
+    /**
+     * The suffix that was passed to {@link setData}.
+     */
+    dataAttributeSuffix: string;
+  }) {
+    this.element.removeAttribute(getDataAttributeKey(dataAttributeSuffix));
+  }
+
+  /**
+   * Get the data stored by a data attribute.
+   * @returns If the data is found, return a string, else return null.
+   */
+  getData({
+    dataAttributeSuffix,
+  }: {
+    /**
+     * The suffix that was passed to {@link setData}.
+     */
+    dataAttributeSuffix: string;
+  }): string | null {
+    return this.element.getAttribute(getDataAttributeKey(dataAttributeSuffix));
+  }
+}
+
+/**
+ * Manipulation of an HTML element meant to store IDs that refer to intervals.
+ * Storing of IDs works like a set: does not guarantee for insertion order to be maintained,
+ * and all elements are unique.
+ */
+class LoopIdHandler extends DataElementHandler {
+  #idSuffix = "looping-id" as const;
+
+  /**
+   * @returns The saved IDs.
+   */
+  getIds(): number[] {
+    return JSON.parse(
+      this.getData({ dataAttributeSuffix: this.#idSuffix }) ?? "[]",
+    );
+  }
+
+  #setIds({ ids }: { ids: number[] }) {
+    this.setData({
+      dataAttributeSuffix: this.#idSuffix,
+      data: JSON.stringify(ids),
+    });
+  }
+
+  /**
+   * Add an ID. Ids that already exist in the data are not added.
+   */
+  addId({ id }: { id: number }) {
+    const data: number[] = this.getIds();
+    let newData: number[] = [id];
+    if (data.length > 0) {
+      if (!data.includes(id)) {
+        newData = [...data, id];
+      } else {
+        newData = data;
+      }
+    }
+
+    this.#setIds({ ids: newData });
+  }
+
+  removeId({ id }: { id: number }) {
+    const data: number[] = this.getIds();
+    const newData = new Set(data);
+    newData.delete(id);
+    this.#setIds({ ids: [...newData] });
+  }
+
+  removeAllIds() {
+    this.#setIds({ ids: [] });
+  }
+}
+
+const loopIdHandler = new LoopIdHandler();
+
+/**
  * Set of functions that handle responding.
  */
 const _responseHandlers: ResponseRegistry = {
@@ -102,6 +222,8 @@ const _responseHandlers: ResponseRegistry = {
       });
     }, 20);
 
+    loopIdHandler.addId({ id: intervalId });
+
     sendResponse<"enable_looping">(baseSendResponse, {
       success: true,
       data: { intervalId },
@@ -109,10 +231,23 @@ const _responseHandlers: ResponseRegistry = {
   },
 
   disable_looping: (message, baseSendResponse) => {
-    window.clearInterval(message.data.intervalId);
+    loopIdHandler.getIds().forEach((id) => {
+      window.clearInterval(id);
+    });
+    loopIdHandler.removeAllIds();
+
     sendResponse<"disable_looping">(baseSendResponse, {
       success: true,
       data: null,
+    });
+  },
+
+  get_loop_ids: (message, baseSendResponse) => {
+    const ids = loopIdHandler.getIds();
+
+    sendResponse<"get_loop_ids">(baseSendResponse, {
+      success: true,
+      data: { loopIds: ids },
     });
   },
 
