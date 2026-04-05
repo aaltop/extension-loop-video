@@ -104,7 +104,6 @@ export default function DomainDataView() {
           })}
         </ul>
       </details>
-      <div>{`Chosen: ${JSON.stringify(checked)}`}</div>
       <ul>
         {urlData.data.map(({ url, ...val }) => {
           const correctTags =

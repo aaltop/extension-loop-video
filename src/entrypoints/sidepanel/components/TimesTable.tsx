@@ -10,6 +10,7 @@ import {
   useTimeSectionDisable,
 } from "../SavedStateContext";
 import { commands } from "../commands";
+import ButtonRow from "./ButtonRow";
 
 import "./TimesTable.css";
 
@@ -85,32 +86,34 @@ export default function TimesTable() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          setAllDisabled(!prevAllDisabled);
-          setPrevAllDisabled(!prevAllDisabled);
-        }}
-      >
-        {prevAllDisabled ? "Enable all" : "Disable All"}
-      </button>
-      <button
-        type="button"
-        disabled={timeSectionsLength.get() <= 1}
-        onClick={() => {
-          timeSectionsLength.set(timeSectionsLength.get() - 1);
-        }}
-      >
-        Remove Section
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          timeSectionsLength.set(timeSectionsLength.get() + 1);
-        }}
-      >
-        Add Section
-      </button>
+      <ButtonRow>
+        <button
+          type="button"
+          onClick={() => {
+            setAllDisabled(!prevAllDisabled);
+            setPrevAllDisabled(!prevAllDisabled);
+          }}
+        >
+          {prevAllDisabled ? "Enable all" : "Disable All"}
+        </button>
+        <button
+          type="button"
+          disabled={timeSectionsLength.get() <= 1}
+          onClick={() => {
+            timeSectionsLength.set(timeSectionsLength.get() - 1);
+          }}
+        >
+          Remove Section
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            timeSectionsLength.set(timeSectionsLength.get() + 1);
+          }}
+        >
+          Add Section
+        </button>
+      </ButtonRow>
       <table>
         <thead>
           <tr>

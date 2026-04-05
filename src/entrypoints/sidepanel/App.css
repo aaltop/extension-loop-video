@@ -1,4 +1,30 @@
-div.button-controls {
+div.controls {
+  padding-block-start: 1rem;
   display: flex;
   flex-direction: column;
+  row-gap: 1rem;
+}
+
+div.save-load {
+  display: flex;
+  justify-content: space-around;
+
+  column-gap: 1rem;
+
+  & button {
+    flex: 1 1 0;
+  }
+
+}
+
+button.loop-toggle {
+  &[data-enabled="true"] {
+    --highlight-color: var(--brand-color);
+    filter: drop-shadow(0px 0px 8px var(--highlight-color));
+    border-color: var(--highlight-color);
+  }
+}
+
+div.highlight {
+  display: flex;
 }

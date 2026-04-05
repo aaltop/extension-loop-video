@@ -1,6 +1,8 @@
 :root {
-  --background-color: hsl(from blue h calc(s - 90) calc(l - 30));
+  --background-color: hsl(from blue h calc(s - 90) calc(l - 27));
   --text-color: hsl(from white h s calc(l - 10));
+
+  --brand-color: hsl(from crimson h calc(s + 20) l);
 }
 
 
@@ -15,6 +17,10 @@ body {
       color: inherit;
       
   }
+
+  :not(div, h1, h2, h3, h4, h5, h6) {
+    background-color: hsl(from var(--background-color) h s calc(l - 4));
+  }
 }
 
 /* for user-select setting */
@@ -27,6 +33,8 @@ button {
   border-radius: 7px;
   border-style: solid;
   cursor: pointer;
+
+  text-align: center;
 
   &:hover:not(:disabled) {
     border-color: var(--text-color);
@@ -48,12 +56,17 @@ details {
   }
 }
 
+hr {
+  color: hsl(from var(--text-color) h s calc(l - 30));
+}
+
 .error {
   color: red;
 }
 
 table, th, td {
   border: 1px solid grey;
+  text-align: center;
 }
 
 table input {

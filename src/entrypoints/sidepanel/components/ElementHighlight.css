@@ -1,0 +1,9 @@
+
+button.element-highlight.highlight {
+  flex: 3 1 0;
+  border-radius: 0;
+}
+
+button.element-highlight.nav {
+  flex: 1 1 0;
+}

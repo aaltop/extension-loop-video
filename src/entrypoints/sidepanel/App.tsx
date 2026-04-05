@@ -12,6 +12,7 @@ import DomainDataView from "./components/DomainDataView";
 import MetaDataHandler from "./components/Metadata";
 import ElementHighlight from "./components/ElementHighlight";
 import Console from "./components/Console";
+import ButtonRow from "./components/ButtonRow";
 
 function App() {
   const [intervalIds, setIntervalIds] = useState<number[]>([]);
@@ -61,7 +62,7 @@ function App() {
   }
 
   return (
-    <div key={tabChangeCounter}>
+    <div key={tabChangeCounter} className="app wrapper">
       <button
         type="button"
         onClick={() => {
@@ -76,58 +77,63 @@ function App() {
         <summary>Metadata</summary>
         <MetaDataHandler />
       </details>
+      <hr />
       <TimesTable />
-      <div className="app button-controls">
-        <button
-          onClick={async () => {
-            const response = await commands.saveData(popupData.get());
-            handleResponse(response);
-          }}
-        >
-          Save state
-        </button>
-        <button
-          onClick={async () => {
-            const response = await commands.loadData();
-            handleResponse(response);
-            if (response.success) {
-              popupData.set({
-                ...popupData.get(),
-                ...response.data,
-              });
-            }
-          }}
-        >
-          Load state
-        </button>
-        <div>
+      <hr />
+      <div className="app controls">
+        <ButtonRow>
           <button
-            type="button"
             onClick={async () => {
-              if (intervalIds.length > 0) {
-                const response = await commands.disableLooping();
-                handleResponse(response);
-                setIntervalIds(() => []);
-              } else {
-                const response = await commands.enableLooping(popupData.get());
-                handleResponse(response);
-                if (response.success) {
-                  setIntervalIds((prev) => {
-                    return [...prev, response.data.intervalId];
-                  });
-                }
+              const response = await commands.saveData(popupData.get());
+              handleResponse(response);
+            }}
+          >
+            Save state
+          </button>
+          <button
+            onClick={async () => {
+              const response = await commands.loadData();
+              handleResponse(response);
+              if (response.success) {
+                popupData.set({
+                  ...popupData.get(),
+                  ...response.data,
+                });
               }
             }}
           >
-            {intervalIds.length > 0 ? "Disable looping" : "Enable looping"}
+            Load state
           </button>
-        </div>
+        </ButtonRow>
 
-        <div>
+        <button
+          className="app loop-toggle"
+          data-enabled={intervalIds.length > 0}
+          type="button"
+          onClick={async () => {
+            if (intervalIds.length > 0) {
+              const response = await commands.disableLooping();
+              handleResponse(response);
+              setIntervalIds(() => []);
+            } else {
+              const response = await commands.enableLooping(popupData.get());
+              handleResponse(response);
+              if (response.success) {
+                setIntervalIds((prev) => {
+                  return [...prev, response.data.intervalId];
+                });
+              }
+            }
+          }}
+        >
+          {intervalIds.length > 0 ? "Disable looping" : "Enable looping"}
+        </button>
+
+        <ButtonRow>
           <ElementHighlight />
-        </div>
+        </ButtonRow>
 
-        <div>
+        <ButtonRow>
           <button
             type="button"
             onClick={async () => {
@@ -137,9 +143,7 @@ function App() {
           >
             Download data for current domain
           </button>
-        </div>
 
-        <div>
           <button
             type="button"
             onClick={async () => {
@@ -149,8 +153,9 @@ function App() {
           >
             Load data from file
           </button>
-        </div>
+        </ButtonRow>
       </div>
+      <hr />
       <details>
         <summary>Domain data</summary>
         <DomainDataView />

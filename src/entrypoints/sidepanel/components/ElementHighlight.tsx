@@ -1,6 +1,7 @@
 import { useLoopableIndex, useSelectors } from "../SavedStateContext";
 import { ConsoleContext } from "../ConsoleContext";
 import { commands } from "../commands";
+import "./ElementHighlight.css";
 
 /**
  * Component for highlighting elements based on a selector.
@@ -59,11 +60,16 @@ export default function ElementHighlight() {
 
   return (
     <>
-      <button type="button" onClick={async () => await addToIndex(-1)}>
+      <button
+        type="button"
+        className="element-highlight nav"
+        onClick={async () => await addToIndex(-1)}
+      >
         Previous
       </button>
       <button
         type="button"
+        className="element-highlight highlight"
         onClick={async () => {
           // this addToIndex call is here mostly to keep the values
           // up to date if something changes on the page.
@@ -84,7 +90,11 @@ export default function ElementHighlight() {
       >
         {`Highlight video ${loopableIndex.get() + 1} out of ${elemNum ?? "none"}`}
       </button>
-      <button type="button" onClick={async () => await addToIndex(1)}>
+      <button
+        type="button"
+        className="element-highlight nav"
+        onClick={async () => await addToIndex(1)}
+      >
         Next
       </button>
     </>
