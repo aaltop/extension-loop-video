@@ -126,8 +126,6 @@ function ErrorMessage() {
 }
 
 function App() {
-  // why array? Thinking ahead to the possibility of having multiple loops
-  // active at once, though perhaps not so likely to be implemented.
   const [intervalIds, setIntervalIds] = useState<number[]>([]);
   const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
   const { log, logger } = useContext(ConsoleContext);
