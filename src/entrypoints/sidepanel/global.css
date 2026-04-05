@@ -1,0 +1,92 @@
+:root {
+  --background-color: hsl(from blue h calc(s - 90) calc(l - 30));
+  --text-color: hsl(from white h s calc(l - 10));
+}
+
+
+body {
+  padding: 1rem;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  user-select: text;
+  * {
+      user-select: inherit;
+      background-color: inherit;
+      color: inherit;
+      
+  }
+}
+
+/* for user-select setting */
+button {
+  user-select: none;
+}
+
+
+button {
+  border-radius: 7px;
+  border-style: solid;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--text-color);
+  }
+
+  &:disabled {
+    color: hsl(from var(--text-color) h s l / 0.5);
+  }
+}
+
+details {
+  margin-block: 1rem;
+  padding-inline: 0.5rem;
+  border: 1px solid var(--text-color);
+
+  &:open > summary {
+    margin-block-end: 1rem;
+    border-block-end: 1px solid var(--text-color);
+  }
+}
+
+.error {
+  color: red;
+}
+
+table, th, td {
+  border: 1px solid grey;
+}
+
+table input {
+  max-inline-size: 7rem;
+}
+
+label > input {
+  margin-inline-start: 0.5rem;
+}
+
+.metadata-input {
+  margin-block-end: 1.0rem;
+}
+
+.metadata-handler {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+#url-title {
+  display: inline;
+  margin: 0.5rem;
+}
+
+#description-input {
+  max-inline-size: 100%;
+  min-inline-size: 100%;
+  min-block-size: 5rem;
+}
+  
+summary {
+  padding-inline: 0.5rem;
+  padding-block: 0.5rem;
+  cursor: pointer;
+}

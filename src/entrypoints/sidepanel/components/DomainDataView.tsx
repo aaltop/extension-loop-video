@@ -1,5 +1,5 @@
 import { commands, DomainData, URLMetaData } from "../commands";
-import { ConsoleContext } from "../ConsoleProvider";
+import { ConsoleContext } from "../ConsoleContext";
 
 interface CombinedMetaData extends URLMetaData {
   url: string;

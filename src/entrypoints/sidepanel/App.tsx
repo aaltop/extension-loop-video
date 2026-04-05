@@ -3,127 +3,15 @@ import "./App.css";
 
 import { commands } from "./commands";
 import { Response } from "@/src/typing/commands";
-import {
-  useLoopableIndex,
-  useSavedState,
-  useSelectors,
-} from "./SavedStateContext";
-import { ConsoleContext } from "./ConsoleProvider";
-import TimesTable from "./components/TimesTable";
+import { useSavedState } from "./SavedStateContext";
+import { ConsoleContext } from "./ConsoleContext";
 import { SyncMessage } from "../content/typing";
+
+import TimesTable from "./components/TimesTable";
 import DomainDataView from "./components/DomainDataView";
 import MetaDataHandler from "./components/Metadata";
-
-function VideoHighlight() {
-  const loopableIndex = useLoopableIndex();
-  const selectors = useSelectors();
-  const { logger } = useContext(ConsoleContext);
-  const [elemNum, setElemNum] = useState<number>(0);
-
-  useEffect(() => {
-    async function execute() {
-      await queryAndSetElemNum();
-    }
-    execute();
-  }, []);
-
-  async function getElementListLength(selectors: string) {
-    const response = await commands.elementListLength({
-      selectors,
-    });
-    if (response.success) {
-      return response.data.length;
-    }
-  }
-
-  /**
-   * Queries and sets the number of elements matching the current
-   * selectors value.
-   * @returns the new elemNum value.
-   */
-  async function queryAndSetElemNum() {
-    const len = (await getElementListLength(selectors.get())) ?? 0;
-    setElemNum(() => len);
-    return len;
-  }
-
-  /**
-   * Add `val` to the loopableIndex. This updates the state to be current
-   * before the update.
-   * @returns the new index.
-   */
-  async function addToIndex(val: number) {
-    const newElemNum = await queryAndSetElemNum();
-    if (newElemNum === 0 || newElemNum === null) {
-      loopableIndex.set(-1);
-      return -1;
-    }
-    const prev = loopableIndex.get();
-
-    let newIndex = prev + val;
-    newIndex = (newElemNum + (newIndex % newElemNum)) % newElemNum;
-    loopableIndex.set(newIndex);
-    return newIndex;
-  }
-
-  return (
-    <>
-      <button type="button" onClick={async () => await addToIndex(-1)}>
-        Previous
-      </button>
-      <button
-        type="button"
-        onClick={async () => {
-          // this addToIndex call is here mostly to keep the values
-          // up to date if something changes on the page.
-          const newLoopableIndex = await addToIndex(0);
-          if (newLoopableIndex < 0) return;
-          const indices = [newLoopableIndex];
-          const response = await commands.highlightElements({
-            selectors: selectors.get(),
-            indices,
-          });
-          // if (response.success && response.data.invalidIndices.length > 0) {
-          //   const indicesString = JSON.stringify(response.data.invalidIndices);
-          //   logger.log(
-          //     JSON.stringify(`Invalid highlight indices: ${indicesString}`),
-          //   );
-          // }
-        }}
-      >
-        {`Highlight video ${loopableIndex.get() + 1} out of ${elemNum ?? "none"}`}
-      </button>
-      <button type="button" onClick={async () => await addToIndex(1)}>
-        Next
-      </button>
-    </>
-  );
-}
-
-function ErrorMessage() {
-  const { log } = useContext(ConsoleContext);
-
-  const latest = log.at(-1);
-
-  const message = latest
-    ? `${latest.datetime.toISOString()} ${latest.message}`
-    : "";
-
-  return (
-    <>
-      {log.slice(-5).map((msg, i) => {
-        const message = msg
-          ? `${msg.datetime.toISOString()} ${msg.message}`
-          : "";
-        return (
-          <p key={i} className="error">
-            {message}
-          </p>
-        );
-      })}
-    </>
-  );
-}
+import ElementHighlight from "./components/ElementHighlight";
+import Console from "./components/Console";
 
 function App() {
   const [intervalIds, setIntervalIds] = useState<number[]>([]);
@@ -189,7 +77,7 @@ function App() {
         <MetaDataHandler />
       </details>
       <TimesTable />
-      <div>
+      <div className="app button-controls">
         <button
           onClick={async () => {
             const response = await commands.saveData(popupData.get());
@@ -236,8 +124,9 @@ function App() {
         </div>
 
         <div>
-          <VideoHighlight />
+          <ElementHighlight />
         </div>
+
         <div>
           <button
             type="button"
@@ -249,6 +138,7 @@ function App() {
             Download data for current domain
           </button>
         </div>
+
         <div>
           <button
             type="button"
@@ -262,13 +152,13 @@ function App() {
         </div>
       </div>
       <details>
-        <summary>Console</summary>
-        <ErrorMessage />
+        <summary>Domain data</summary>
+        <DomainDataView />
       </details>
       <hr />
       <details>
-        <summary>Domain data</summary>
-        <DomainDataView />
+        <summary>Console</summary>
+        <Console />
       </details>
     </div>
   );
