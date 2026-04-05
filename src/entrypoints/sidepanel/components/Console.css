@@ -1,0 +1,35 @@
+.console.wrapper {
+  max-block-size: 20rem;
+  block-size: 20rem;
+  overflow-y: scroll;
+
+
+  .console.entry {
+    span:nth-child(2) {
+      margin-inline: 0.5rem;
+    }
+  }
+
+  .console.level {
+
+    &.debug {
+      color: hsl(from blue h calc(s - 100) calc(l + 10));
+    }
+
+    &.info {
+      color: greenyellow;
+    }
+
+    &.warning {
+      color: orange;
+    }
+
+    &.error {
+        color: red;
+    }
+
+    &.critical {
+      color: magenta
+    }
+  }
+}

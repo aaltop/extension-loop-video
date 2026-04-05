@@ -30,9 +30,7 @@ function useURLMetaData(): {
 
   async function update() {
     const response = await commands.loadDomainData();
-    logger.log(JSON.stringify(response));
     if (!response.success) {
-      logger.log(response.message);
       setDomainData(() => {
         return { loopingData: {} };
       });

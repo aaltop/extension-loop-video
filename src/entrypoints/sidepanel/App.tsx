@@ -4,7 +4,7 @@ import "./App.css";
 import { commands } from "./commands";
 import { Response } from "@/src/typing/commands";
 import { useSavedState } from "./SavedStateContext";
-import { ConsoleContext } from "./ConsoleContext";
+import { ConsoleContext, LoggingLevel } from "./ConsoleContext";
 import { SyncMessage } from "../content/typing";
 
 import TimesTable from "./components/TimesTable";
@@ -57,7 +57,7 @@ function App() {
 
   function handleResponse(response: Response<unknown>) {
     if (!response.success) {
-      logger.log(response.message);
+      logger.error("Error from request:", response.message);
     }
   }
 
@@ -84,6 +84,7 @@ function App() {
         <ButtonRow>
           <button
             onClick={async () => {
+              logger.debug("Saving data");
               const response = await commands.saveData(popupData.get());
               handleResponse(response);
             }}
@@ -92,6 +93,7 @@ function App() {
           </button>
           <button
             onClick={async () => {
+              logger.debug("Loading data");
               const response = await commands.loadData();
               handleResponse(response);
               if (response.success) {
@@ -112,10 +114,12 @@ function App() {
           type="button"
           onClick={async () => {
             if (intervalIds.length > 0) {
+              logger.debug("Disabling looping");
               const response = await commands.disableLooping();
               handleResponse(response);
               setIntervalIds(() => []);
             } else {
+              logger.debug("Enabling looping");
               const response = await commands.enableLooping(popupData.get());
               handleResponse(response);
               if (response.success) {
@@ -137,6 +141,7 @@ function App() {
           <button
             type="button"
             onClick={async () => {
+              logger.info("Starting download of data");
               const response = await commands.downloadData();
               handleResponse(response);
             }}
@@ -147,6 +152,7 @@ function App() {
           <button
             type="button"
             onClick={async () => {
+              logger.info("Loading data from file");
               const response = await commands.loadDataFromFile();
               handleResponse(response);
             }}
