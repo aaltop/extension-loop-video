@@ -1,0 +1,16 @@
+div.times-table {
+  display: flex;
+  flex-direction: column;
+  min-width: 6rem;
+
+  row-gap: 0.5rem;
+}
+
+button.times-table {
+  width: 100%;
+}
+
+input.times-table {
+  max-width: none;
+  width: 100%;
+}

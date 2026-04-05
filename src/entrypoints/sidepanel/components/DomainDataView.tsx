@@ -1,35 +1,6 @@
 import { commands, DomainData, URLMetaData } from "../commands";
 import { ConsoleContext } from "../ConsoleProvider";
 
-// const domainData: DomainData = {
-//   loopingData: {
-//     url: {
-//       title: "Video 1",
-//       loopableIndex: 0,
-//       selectors: "video",
-//       tags: ["music", "funny"],
-//       timeSections: [
-//         {
-//           endTime: 0,
-//           startTime: 0,
-//         },
-//       ],
-//     },
-//     url2: {
-//       title: "Video 2",
-//       loopableIndex: 0,
-//       selectors: "video",
-//       tags: ["music", "soothing"],
-//       timeSections: [
-//         {
-//           endTime: 0,
-//           startTime: 0,
-//         },
-//       ],
-//     },
-//   },
-// };
-
 interface CombinedMetaData extends URLMetaData {
   url: string;
 }

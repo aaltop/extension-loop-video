@@ -1,14 +1,42 @@
-button {
-  border-radius: 7px;
-  border-style: solid;
+:root {
+  --background-color: hsl(from blue h calc(s - 90) calc(l - 30));
+  --text-color: hsl(from white h s calc(l - 10));
 }
+
 
 body {
   padding: 1rem;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  * {
+      background-color: inherit;
+      color: inherit;
+      
+  }
+}
+  
+button {
+  border-radius: 7px;
+  border-style: solid;
+
+  &:hover {
+    border-color: var(--text-color);
+  }
+}
+
+details {
+  margin-block: 1rem;
+  padding-inline: 0.5rem;
+  border: 1px solid var(--text-color);
+
+  &:open > summary {
+    margin-block-end: 1rem;
+    border-block-end: 1px solid var(--text-color);
+  }
 }
 
 .error {
-  color: darkred;
+  color: red;
 }
 
 table, th, td {
@@ -42,10 +70,6 @@ label > input {
   max-inline-size: 100%;
   min-inline-size: 100%;
   min-block-size: 5rem;
-}
-
-details {
-  border: 1px solid black;
 }
   
 summary {

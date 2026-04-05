@@ -1,4 +1,7 @@
-import { TimeSection } from "../commands";
+/**
+ * @file Table containing inputs for time.
+ */
+
 import {
   useLoopableIndex,
   useLoopEnds,
@@ -8,31 +11,7 @@ import {
 } from "../SavedStateContext";
 import { commands } from "../commands";
 
-type Times = TimeSection;
-
-function useTimes() {
-  const [times, setTimes] = useState<Times>({ startTime: 0, endTime: 0 });
-
-  function isValid(time: number): boolean {
-    return time >= 0;
-  }
-
-  function setStartTime(startTime: number) {
-    setTimes((prev) => {
-      if (!isValid(startTime)) return prev;
-      return { ...prev, startTime };
-    });
-  }
-
-  function setEndTime(endTime: number) {
-    setTimes((prev) => {
-      if (!isValid) return prev;
-      return { ...prev, endTime };
-    });
-  }
-
-  return { ...times, setStartTime, setEndTime };
-}
+import "./TimesTable.css";
 
 function TimeInput({
   time,
@@ -46,30 +25,34 @@ function TimeInput({
 
   return (
     <td>
-      <button
-        className="video-time-button"
-        type="button"
-        onClick={async () => {
-          const response = await commands.getVideoTime({
-            loopableIndex: loopableIndex.get(),
-            selectors: selectors.get(),
-          });
-          if (response.success) {
-            setTime(response.data.time);
-          } else {
-            await commands.logMessage(response.message);
-          }
-        }}
-      >
-        Set as current video time
-      </button>
-      <input
-        type="number"
-        value={time}
-        onChange={(ev) => {
-          setTime(parseFloat(ev.target.value));
-        }}
-      />
+      <div className="times-table">
+        <button
+          className="times-table"
+          type="button"
+          onClick={async () => {
+            const response = await commands.getVideoTime({
+              loopableIndex: loopableIndex.get(),
+              selectors: selectors.get(),
+            });
+            if (response.success) {
+              setTime(response.data.time);
+            } else {
+              await commands.logMessage(response.message);
+            }
+          }}
+        >
+          Set as current video time
+        </button>
+        <input
+          className="times-table"
+          type="number"
+          min={0}
+          value={time}
+          onChange={(ev) => {
+            setTime(parseFloat(ev.target.value));
+          }}
+        />
+      </div>
     </td>
   );
 }
