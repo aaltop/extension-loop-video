@@ -85,7 +85,7 @@ export default function TimesTable() {
   ));
 
   return (
-    <>
+    <div className="times-table wrapper">
       <ButtonRow>
         <button
           type="button"
@@ -114,7 +114,7 @@ export default function TimesTable() {
           Add Section
         </button>
       </ButtonRow>
-      <table>
+      <table className="times-table">
         <thead>
           <tr>
             <th scope="col">Disable/Enable Section</th>
@@ -124,6 +124,6 @@ export default function TimesTable() {
         </thead>
         <tbody>{sections}</tbody>
       </table>
-    </>
+    </div>
   );
 }

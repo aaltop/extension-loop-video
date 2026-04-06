@@ -3,6 +3,8 @@
  */
 import { useTitle, useDescription, useTags } from "../SavedStateContext";
 
+import "./Metadata.css";
+
 function ToggleableInput({
   title,
   enabledChild,
@@ -20,7 +22,7 @@ function ToggleableInput({
   const enabledInfo = toggleInfo?.enabled ?? `Lock ${title}`;
 
   return (
-    <div className="metadata-input">
+    <div>
       {disabled ? (
         disabledChild
       ) : (
@@ -90,6 +92,8 @@ function Description() {
 
 function Tags() {
   const [newTag, setNewTag] = useState<string>("");
+  const [modify, setModify] = useState<boolean>(false);
+  const [deleteTags, setDeleteTags] = useState<string[]>(() => []);
   const tags = useTags();
 
   const tagsItems = tags
@@ -97,58 +101,93 @@ function Tags() {
     ?.values()
     .map((tag) => {
       return (
-        <ToggleableInput
-          disabledChild={<li>{tag}</li>}
-          enabledChild={
-            <li>
-              {tag}
-              <button
-                type="button"
-                onClick={() => {
-                  const newSet = tags.get();
-                  newSet.delete(tag);
-                  tags.set(newSet);
-                }}
-              >
-                Remove
-              </button>
-            </li>
-          }
-          title="Tag"
-        />
+        <li key={tag} className={`metadata ${modify ? "" : "static"}`}>
+          <b>
+            {modify ? (
+              <label>
+                {tag}{" "}
+                <input
+                  type="checkbox"
+                  name={tag}
+                  onChange={(ev) => {
+                    setDeleteTags((prev) => {
+                      const curr = new Set(prev);
+                      if (ev.target.checked) {
+                        curr.add(tag);
+                      } else {
+                        curr.delete(tag);
+                      }
+                      return [...curr];
+                    });
+                  }}
+                />
+              </label>
+            ) : (
+              tag
+            )}
+          </b>
+        </li>
       );
     });
 
   const addTag = (
-    <li>
-      <label>
-        New Tag
-        <input
-          type="text"
-          value={newTag}
-          onChange={(ev) => {
-            const newValue = ev.target.value;
-            setNewTag(() => newValue);
-          }}
-          placeholder="New Tag"
-        />
+    <label>
+      New Tag
+      <input
+        type="text"
+        value={newTag}
+        onChange={(ev) => {
+          const newValue = ev.target.value;
+          setNewTag(() => newValue);
+        }}
+        placeholder="New Tag"
+      />
+      <button
+        type="button"
+        onClick={() => {
+          if (newTag.length > 0) {
+            const newSet = tags.get();
+            newSet.add(newTag);
+            tags.set(newSet);
+          }
+        }}
+      >
+        Save New Tag
+      </button>
+    </label>
+  );
+
+  return (
+    <div>
+      <fieldset className="metadata tags">
+        <legend>Tags</legend>
         <button
           type="button"
+          className={`metadata ${tags.get().size > 0 ? "" : "global-hidden"}`}
+          onClick={() => setModify((prev) => !prev)}
+        >
+          {modify ? "lock" : "modify"}
+        </button>
+        <button
+          className={`metadata delete-tags ${modify ? "" : "global-hidden"}`}
+          type="button"
+          disabled={deleteTags.length < 1}
           onClick={() => {
-            if (newTag.length > 0) {
-              const newSet = tags.get();
-              newSet.add(newTag);
-              tags.set(newSet);
+            const newTags = tags.get().difference(new Set(deleteTags));
+            tags.set(newTags);
+            setDeleteTags(() => []);
+            if (newTags.size < 1) {
+              setModify(() => false);
             }
           }}
         >
-          Save New Tag
+          Delete checked
         </button>
-      </label>
-    </li>
+        <ul>{tagsItems}</ul>
+      </fieldset>
+      <div>{addTag}</div>
+    </div>
   );
-
-  return <ul>{tagsItems ? [tagsItems, addTag] : [addTag]}</ul>;
 }
 
 export default function MetaDataHandler() {
@@ -157,7 +196,7 @@ export default function MetaDataHandler() {
   const tags = useTags();
 
   return (
-    <div className="metadata-handler">
+    <div className="metadata wrapper">
       <Title />
       <Description />
       <Tags />

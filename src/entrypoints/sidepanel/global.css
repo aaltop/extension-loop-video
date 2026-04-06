@@ -1,13 +1,23 @@
 :root {
-  --background-color: hsl(from blue h calc(s - 90) calc(l - 27));
-  /* to set objects (buttons etc) apart from the background (body) */
-  --foreground-color: hsl(from var(--background-color) h s calc(l - 4));
-  --text-color: hsl(from white h s calc(l - 10));
+    --background-color: hsl(from blue h calc(s - 90) calc(l - 27));
+    /* to set objects (buttons etc) apart from the background (body) */
+    --foreground-color: hsl(from var(--background-color) h s calc(l - 4));
+    --text-color: hsl(from white h s calc(l - 10));
+    
+    --brand-color: hsl(from crimson h calc(s + 20) l);
+  }
 
-  --brand-color: hsl(from crimson h calc(s + 20) l);
+  
+/* GLOBAL STYLES */
+/* styles that are intended to be globally accessible by the "namespace" global */
+
+.global-hidden {
+  display: none;
 }
 
+/* GLOBAL STYLES */
 
+  
 body {
   padding: 1rem;
   background-color: var(--background-color);
@@ -44,6 +54,7 @@ button {
 
   &:disabled {
     color: hsl(from var(--text-color) h s l / 0.5);
+    cursor: default;
   }
 }
 
@@ -52,14 +63,23 @@ details {
   padding-inline: 0.5rem;
   border: 1px solid var(--text-color);
 
-  &:open > summary {
-    margin-block-end: 1rem;
-    border-block-end: 1px solid var(--text-color);
+  &:open {
+
+    padding-block-end: 1rem;;
+
+    > summary {
+        margin-block-end: 1rem;
+        border-block-end: 1px solid var(--text-color);
+    }
   }
 }
 
 hr {
   color: hsl(from var(--text-color) h s calc(l - 30));
+}
+
+label > input {
+  margin-inline-start: 0.5rem;
 }
 
 .error {
@@ -73,20 +93,6 @@ table, th, td {
 
 table input {
   max-inline-size: 7rem;
-}
-
-label > input {
-  margin-inline-start: 0.5rem;
-}
-
-.metadata-input {
-  margin-block-end: 1.0rem;
-}
-
-.metadata-handler {
-  display: flex;
-  flex-direction: column;
-  row-gap: 0.5rem;
 }
 
 #url-title {

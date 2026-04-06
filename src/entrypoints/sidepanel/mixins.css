@@ -1,0 +1,27 @@
+.input-with-button {
+  input + button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  label:has(+ button):has(input:last-child) {
+    + button {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    input:last-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-inline-end: 1px;
+    }
+  }
+
+  input:has(+ button) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-inline-end: 1px;
+  }
+
+  
+}

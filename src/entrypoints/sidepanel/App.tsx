@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import "@/entrypoints/sidepanel/mixins.css";
 
 import { commands } from "./commands";
 import { Response } from "@/src/typing/commands";
@@ -62,7 +63,7 @@ function App() {
   }
 
   return (
-    <div key={tabChangeCounter} className="app wrapper">
+    <div key={tabChangeCounter} className="app wrapper input-with-button">
       <button
         type="button"
         onClick={() => {

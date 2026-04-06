@@ -1,0 +1,36 @@
+.metadata.wrapper {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+  .metadata-input {
+    margin-block-end: 1.0rem;
+  }
+
+  label:has(input:checked) {
+    text-decoration: underline red 2px;
+  }
+  
+  .metadata.tags {
+    padding-inline: 1rem;
+    margin-block: 0.5rem;
+    border: 1px solid var(--text-color);
+    overflow-x: hidden;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    min-inline-size: 100%;
+
+    ul {
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
+      list-style: none;
+      > li.static:not(:first-child) {
+        :before {
+          padding-inline: 0.2rem;
+          content: "\2022";
+        }
+      }
+    }
+  }
+}
