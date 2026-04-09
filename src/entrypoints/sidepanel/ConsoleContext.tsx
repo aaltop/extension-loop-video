@@ -68,7 +68,7 @@ export function toString(entry: ConsoleEntry) {
 type Log = ConsoleEntry[];
 
 type LogCall = (...data: any[]) => void;
-interface Logger {
+export interface Logger {
   debug: LogCall;
   info: LogCall;
   warning: LogCall;

@@ -3,10 +3,10 @@ import "./App.css";
 import "@/entrypoints/sidepanel/mixins.css";
 
 import { commands } from "./commands";
-import { Response } from "@/src/typing/commands";
 import { useSavedState } from "./SavedStateContext";
-import { ConsoleContext, LoggingLevel } from "./ConsoleContext";
+import { ConsoleContext } from "./ConsoleContext";
 import { SyncMessage } from "../content/typing";
+import { handleResponse as baseHandleResponse } from "./helpers";
 
 import TimesTable from "./components/TimesTable";
 import DomainDataView from "./components/DomainDataView";
@@ -14,6 +14,9 @@ import MetaDataHandler from "./components/Metadata";
 import ElementHighlight from "./components/ElementHighlight";
 import Console from "./components/Console";
 import ButtonRow from "./components/ButtonRow";
+import SaveButton from "./components/SaveButton";
+
+import { Response } from "@/src/typing/commands";
 
 function App() {
   const [intervalIds, setIntervalIds] = useState<number[]>([]);
@@ -57,9 +60,7 @@ function App() {
   }, []);
 
   function handleResponse(response: Response<unknown>) {
-    if (!response.success) {
-      logger.error("Error from request:", response.message);
-    }
+    baseHandleResponse(response, logger);
   }
 
   return (
@@ -83,15 +84,7 @@ function App() {
       <hr />
       <div className="app controls">
         <ButtonRow>
-          <button
-            onClick={async () => {
-              logger.debug("Saving data");
-              const response = await commands.saveData(popupData.get());
-              handleResponse(response);
-            }}
-          >
-            Save state
-          </button>
+          <SaveButton />
           <button
             onClick={async () => {
               logger.debug("Loading data");

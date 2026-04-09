@@ -3,6 +3,9 @@
     /* to set objects (buttons etc) apart from the background (body) */
     --foreground-color: hsl(from var(--background-color) h s calc(l - 4));
     --text-color: hsl(from white h s calc(l - 10));
+
+    --success-color: hsl(from green h s calc(l + 10));
+    --failure-color: hsl(from orangered h s calc(l + 10));
     
     --brand-color: hsl(from crimson h calc(s + 20) l);
   }
