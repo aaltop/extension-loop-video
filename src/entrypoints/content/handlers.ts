@@ -201,6 +201,43 @@ class LoopIdHandler extends DataElementHandler {
 const loopIdHandler = new LoopIdHandler();
 
 /**
+ * Data attribute ID used to highlight element by toggling styling.
+ */
+export const HIGHLIGHT_ELEMENT_ATTRIBUTE = getDataAttributeKey("highlighted");
+
+/**
+ * Creates a style element whose styling information is used to style
+ * highlighted elements.
+ */
+function setHighlightStyle() {
+  const highlightStyleId = "extension-loopvideo-highlightstyle" as const;
+  const _highlightStyle: HTMLElement | null = document.getElementById(
+    "extension-loopvideo-highlightstyle",
+  );
+  let highlightStyle: HTMLStyleElement;
+  if (!_highlightStyle) {
+    highlightStyle = document.createElement("style");
+    highlightStyle.id = highlightStyleId;
+    document.head.appendChild(highlightStyle);
+    // bit of a tough one. Thought of using ::after, but of course doesn't work
+    // on "replaced" elements, which a video would be. Other stuff also works
+    // variably: using Youtube as the base testing ground, the video is very weird,
+    // hidden under the rest of the stuff, and doesn't really want to be affected
+    // by "position: " that well, so no z-index, etc. position: fixed; does work,
+    // but it's not the most ideal. This works well enough, though would have
+    // wanted more of an actual "highlight".
+    highlightStyle.sheet?.insertRule(`
+      [${HIGHLIGHT_ELEMENT_ATTRIBUTE}=""] {
+        transition: transform 1.5s;
+        transform: scale(1.5);
+      }    
+    `);
+  }
+}
+
+setHighlightStyle();
+
+/**
  * Set of functions that handle responding.
  */
 const _responseHandlers: ResponseRegistry = {
@@ -264,17 +301,17 @@ const _responseHandlers: ResponseRegistry = {
 
         // just assume HTMLElement
         const htmlElem = elems[idx] as HTMLElement;
-        const highlightedAttr = getDataAttributeKey("highlighted");
+        const highlightedAttr = HIGHLIGHT_ELEMENT_ATTRIBUTE;
         if (htmlElem.getAttribute(highlightedAttr) !== null) {
           // already highlighted, skip this one
           continue;
         }
 
-        const oldBorderStyle = htmlElem.style.border;
-        htmlElem.style.border = "5px solid red";
+        // the styling is applied to this attribute based on the adopted style
+        // sheet specified above in setHighlightStyle
         htmlElem.setAttribute(highlightedAttr, "");
+        htmlElem.scrollIntoView();
         setTimeout(() => {
-          htmlElem.style.border = oldBorderStyle;
           htmlElem.removeAttribute(highlightedAttr);
         }, 3000);
       }
