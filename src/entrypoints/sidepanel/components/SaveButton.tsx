@@ -1,6 +1,6 @@
 import { NOTIFICATION_TIME_MEDIUM } from "@/src/globals";
-import { ConsoleContext } from "../ConsoleContext";
-import { useSavedState } from "../SavedStateContext";
+import { ConsoleContext } from "../contexts/ConsoleContext";
+import { useSavedState } from "../contexts/SavedStateContext";
 import { commands } from "../commands";
 import { handleResponse as baseHandleResponse } from "../helpers";
 import { useTimeout } from "../hooks";

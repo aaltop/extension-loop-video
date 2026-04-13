@@ -97,7 +97,11 @@ export const ConsoleContext = createContext<ConsoleContextValue>({
   },
 });
 
-function ConsoleContextProvider({ children }: { children: React.ReactNode }) {
+export function ConsoleContextProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [log, setLog] = useState<Log>([]);
 
   function loggerWithLevel(level: LoggingLevel) {
@@ -130,4 +134,4 @@ function ConsoleContextProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default ConsoleContextProvider;
+export default ConsoleContext;

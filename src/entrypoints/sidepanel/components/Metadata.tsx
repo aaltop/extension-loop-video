@@ -1,7 +1,11 @@
 /**
  * @file Inputs for setting a URL's metadata.
  */
-import { useTitle, useDescription, useTags } from "../SavedStateContext";
+import {
+  useTitle,
+  useDescription,
+  useTags,
+} from "../contexts/SavedStateContext";
 
 import "./Metadata.css";
 

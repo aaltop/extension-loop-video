@@ -1,5 +1,5 @@
-import { useLoopableIndex, useSelectors } from "../SavedStateContext";
-import { ConsoleContext } from "../ConsoleContext";
+import { useLoopableIndex, useSelectors } from "../contexts/SavedStateContext";
+import { ConsoleContext } from "../contexts/ConsoleContext";
 import { commands } from "../commands";
 import "./ElementHighlight.css";
 

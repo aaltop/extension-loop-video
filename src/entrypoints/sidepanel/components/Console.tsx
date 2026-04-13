@@ -1,4 +1,4 @@
-import { ConsoleContext, toStringIndividual } from "../ConsoleContext";
+import { ConsoleContext, toStringIndividual } from "../contexts/ConsoleContext";
 
 import "./Console.css";
 

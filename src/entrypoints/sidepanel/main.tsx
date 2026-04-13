@@ -3,15 +3,12 @@ import ReactDOM from "react-dom/client";
 
 import App from "./App";
 import "./global.css";
-import { SavedStateProvider } from "./SavedStateContext";
-import ConsoleContextProvider from "./ConsoleContext";
+import Provider from "./contexts/Provider";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <SavedStateProvider>
-      <ConsoleContextProvider>
-        <App />
-      </ConsoleContextProvider>
-    </SavedStateProvider>
+    <Provider>
+      <App />
+    </Provider>
   </React.StrictMode>,
 );

@@ -3,8 +3,8 @@ import "./App.css";
 import "@/entrypoints/sidepanel/mixins.css";
 
 import { commands } from "./commands";
-import { useSavedState } from "./SavedStateContext";
-import { ConsoleContext } from "./ConsoleContext";
+import { useSavedState } from "./contexts/SavedStateContext";
+import { ConsoleContext } from "./contexts/ConsoleContext";
 import { SyncMessage } from "../content/typing";
 import { handleResponse as baseHandleResponse } from "./helpers";
 

@@ -1,5 +1,5 @@
 import { Response } from "@/src/typing/commands";
-import { Logger } from "./ConsoleContext";
+import { Logger } from "./contexts/ConsoleContext";
 
 /**
  * Handle the response, performing general actions based on the result of
