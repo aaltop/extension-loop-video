@@ -1,4 +1,4 @@
-import { NOTIFICATION_TIME_MEDIUM } from "@/src/globals";
+import { NOTIFICATION_TIME_LONG } from "@/src/globals";
 import { ConsoleContext } from "../contexts/ConsoleContext";
 import { useSavedState } from "../contexts/SavedStateContext";
 import { commands } from "../commands";
@@ -6,19 +6,25 @@ import { handleResponse as baseHandleResponse } from "../helpers";
 import { useTimeout } from "../hooks";
 
 import "./Savebutton.css";
+import NotificationContext from "../contexts/NotificationContext";
+import { use } from "react";
 
 const DEFAULT_TEXT = "Save state" as const;
 
 export default function SaveButton() {
-  const { logger } = useContext(ConsoleContext);
   const [buttonText, setButtonText] = useState<string>(DEFAULT_TEXT);
+
+  const { logger } = useContext(ConsoleContext);
+  const { set: setNotification } = use(NotificationContext);
   const savedTimeout = useTimeout<"success" | "failure">({
-    deactivationDelay: NOTIFICATION_TIME_MEDIUM,
+    deactivationDelay: NOTIFICATION_TIME_LONG,
     activationFunction: () => {
       setButtonText(() => "Saved!");
       return { stateValue: "success" };
     },
-    deactivationFunction: () => setButtonText(() => DEFAULT_TEXT),
+    deactivationFunction: () => {
+      setButtonText(() => DEFAULT_TEXT);
+    },
   });
   const popupData = useSavedState();
 
@@ -37,6 +43,10 @@ export default function SaveButton() {
               return { stateValue: "success" };
             } else {
               setButtonText(() => "Not saved");
+              setNotification({
+                message: `Unable to save: ${response.message}`,
+                type: "error",
+              });
               return { stateValue: "failure" };
             }
           },

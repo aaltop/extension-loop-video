@@ -85,10 +85,6 @@ label > input {
   margin-inline-start: 0.5rem;
 }
 
-.error {
-  color: red;
-}
-
 table, th, td {
   border: 1px solid grey;
   text-align: center;

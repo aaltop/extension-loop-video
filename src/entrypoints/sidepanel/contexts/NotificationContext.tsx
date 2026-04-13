@@ -18,10 +18,14 @@ function createDefaultNotificationInfo(): NotificationInfo {
 export interface NotificationContextProps {
   readonly notification: NotificationInfo;
   readonly set: (newValue: NotificationInfo) => void;
+  readonly reset: () => void;
 }
 const NotificationContext = createContext<NotificationContextProps>({
   notification: createDefaultNotificationInfo(),
   set(newValue) {
+    throw new Error("Should not be called");
+  },
+  reset() {
     throw new Error("Should not be called");
   },
 });
@@ -41,6 +45,9 @@ export function NotificationContextProvider({
         notification: state,
         set(newValue) {
           setState(() => newValue);
+        },
+        reset() {
+          setState(() => createDefaultNotificationInfo());
         },
       }}
     >

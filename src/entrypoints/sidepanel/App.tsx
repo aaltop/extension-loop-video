@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import "./App.css";
 import "@/entrypoints/sidepanel/mixins.css";
 
@@ -17,19 +17,21 @@ import ButtonRow from "./components/ButtonRow";
 import SaveButton from "./components/SaveButton";
 
 import { Response } from "@/src/typing/commands";
+import Notification from "./components/Notification";
+import { NotificationContextProvider } from "./contexts/NotificationContext";
 
-function App() {
+/**
+ * Component containing general controls.
+ */
+function Controls() {
   const [intervalIds, setIntervalIds] = useState<number[]>([]);
-  const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
-  const { log, logger } = useContext(ConsoleContext);
+
+  const { logger } = use(ConsoleContext);
   const popupData = useSavedState();
 
-  useEffect(() => {
-    async function execute() {
-      await commands.logMessage("Hello from Loop Video!");
-    }
-    execute();
-  }, []);
+  function handleResponse(response: Response<unknown>) {
+    baseHandleResponse(response, logger);
+  }
 
   useEffect(() => {
     async function init() {
@@ -59,29 +61,9 @@ function App() {
     };
   }, []);
 
-  function handleResponse(response: Response<unknown>) {
-    baseHandleResponse(response, logger);
-  }
-
   return (
-    <div key={tabChangeCounter} className="app wrapper input-with-button">
-      <button
-        type="button"
-        onClick={() => {
-          popupData.reset();
-          setTabChangeCounter((prev) => prev + 1);
-        }}
-      >
-        Reset state (reload)
-      </button>
-      <h1>Loop Video</h1>
-      <details>
-        <summary>Metadata</summary>
-        <MetaDataHandler />
-      </details>
-      <hr />
-      <TimesTable />
-      <hr />
+    <NotificationContextProvider>
+      <Notification />
       <div className="app controls">
         <ButtonRow>
           <SaveButton />
@@ -155,11 +137,51 @@ function App() {
           </button>
         </ButtonRow>
       </div>
+    </NotificationContextProvider>
+  );
+}
+
+export default function App() {
+  const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
+  const { log, logger } = useContext(ConsoleContext);
+  const popupData = useSavedState();
+
+  useEffect(() => {
+    async function execute() {
+      await commands.logMessage("Hello from Loop Video!");
+    }
+    execute();
+  }, []);
+
+  return (
+    <div key={tabChangeCounter} className="app wrapper input-with-button">
+      <button
+        type="button"
+        onClick={() => {
+          popupData.reset();
+          setTabChangeCounter((prev) => prev + 1);
+        }}
+      >
+        Reset state (reload)
+      </button>
+      <h1>Loop Video</h1>
+      <details>
+        <summary>Metadata</summary>
+        <MetaDataHandler />
+      </details>
+
+      <hr />
+      <TimesTable />
+
+      <hr />
+      <Controls />
+
       <hr />
       <details>
         <summary>Domain data</summary>
         <DomainDataView />
       </details>
+
       <hr />
       <details>
         <summary>Console</summary>
@@ -168,5 +190,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

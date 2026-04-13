@@ -1,0 +1,37 @@
+.notification.root.wrapper {
+
+
+  .notification.message.wrapper {
+      position: relative;
+      min-block-size: 2.5rem;
+      max-block-size: 2.5rem;
+      overflow-y: hidden;
+      padding-inline: 0.5rem;
+
+    
+      > .notification.message {
+        background-color: hsl(from var(--background-color) h s l / 0.7);
+      }
+    
+      &:is(:hover, :focus-within) {
+        overflow-y: visible;
+        > .notification.message {
+          position: absolute;
+          inset-block-start: 0;
+          inset-inline-start: 0.5rem;
+          max-block-size: fit-content;
+          z-index: 1000;
+        }
+    
+      }
+  }
+
+  .notification.dismiss {
+    min-block-size: 1.5rem;
+    max-block-size: 1.5rem;
+    background-color: var(--background-color);
+    inline-size: 100%;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
