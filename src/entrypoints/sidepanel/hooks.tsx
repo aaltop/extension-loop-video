@@ -8,7 +8,7 @@ function getValidDelay(delay: number) {
  * @template T Type returned by the activation function to represent
  * the result.
  */
-export interface TimeoutProps<T> {
+export interface TimeoutProps<T = "success" | "failure"> {
   /**
    * Function to execute when activated. Returns a value that represents the result.
    * Can optionally return a custom delay that will be used for the timeout.

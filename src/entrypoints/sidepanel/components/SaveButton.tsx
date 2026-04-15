@@ -8,6 +8,7 @@ import { useTimeout } from "../hooks";
 import "./Savebutton.css";
 import NotificationContext from "../contexts/NotificationContext";
 import { use } from "react";
+import { notificationHighlight } from "./Notification";
 
 const DEFAULT_TEXT = "Save state" as const;
 
@@ -30,7 +31,7 @@ export default function SaveButton() {
 
   return (
     <button
-      className={`save-button wrapper ${savedTimeout.state ?? ""}`}
+      className={`save-button wrapper ${notificationHighlight} ${savedTimeout.state ?? ""}`}
       onClick={async () => {
         logger.debug("Saving data");
         const response = await commands.saveData(popupData.get());

@@ -17,8 +17,9 @@ import ButtonRow from "./components/ButtonRow";
 import SaveButton from "./components/SaveButton";
 
 import { Response } from "@/src/typing/commands";
-import Notification from "./components/Notification";
+import Notification from "./components/Notification.tsx";
 import { NotificationContextProvider } from "./contexts/NotificationContext";
+import LoadButton from "./components/LoadButton";
 
 /**
  * Component containing general controls.
@@ -67,21 +68,7 @@ function Controls() {
       <div className="app controls">
         <ButtonRow>
           <SaveButton />
-          <button
-            onClick={async () => {
-              logger.debug("Loading data");
-              const response = await commands.loadData();
-              handleResponse(response);
-              if (response.success) {
-                popupData.set({
-                  ...popupData.get(),
-                  ...response.data,
-                });
-              }
-            }}
-          >
-            Load state
-          </button>
+          <LoadButton />
         </ButtonRow>
 
         <button
