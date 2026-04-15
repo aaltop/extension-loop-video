@@ -15,7 +15,7 @@ export default function Notification() {
       >
         <span
           aria-live="polite"
-          className={`notification message ${notification.type}`}
+          className={`notification message ${notification.type} ${isActive ? "active" : ""}`}
         >
           {notification.message}
         </span>
