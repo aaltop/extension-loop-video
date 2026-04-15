@@ -1,3 +1,7 @@
+/**
+ * Commands for communicating with the content script.
+ */
+
 import { Request, Response } from "@/src/typing/commands";
 import { getTabs } from "@/src/extension";
 
@@ -10,6 +14,7 @@ export type CommandString =
   | "save_data"
   | "load_data"
   | "load_domain_data"
+  | "delete_domain_data"
   | "download_data"
   | "load_data_from_file"
   | "enable_looping"
@@ -203,6 +208,23 @@ async function loadDomainData() {
   });
 }
 
+export interface CommandRegistry {
+  delete_domain_data: RequestResponsePair<
+    Request<"delete_domain_data", null>,
+    Response<null>
+  >;
+}
+
+/**
+ * Delete all the data for this domain from storage.
+ */
+async function deleteDomainData() {
+  return await sendToTab<"delete_domain_data">({
+    command: "delete_domain_data",
+    data: null,
+  });
+}
+
 interface IntervalIdData {
   intervalId: number;
 }
@@ -340,6 +362,7 @@ export const commands = {
   saveData,
   loadData,
   loadDomainData,
+  deleteDomainData,
   enableLooping,
   disableLooping,
   getLoopIds,

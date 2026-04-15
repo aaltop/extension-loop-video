@@ -130,6 +130,15 @@ export default function DomainDataView() {
           );
         })}
       </ul>
+      <button
+        type="button"
+        onClick={async () => {
+          await commands.deleteDomainData();
+          urlData.update();
+        }}
+      >
+        Delete domain data
+      </button>
     </div>
   );
 }

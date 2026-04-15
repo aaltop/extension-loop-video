@@ -23,6 +23,9 @@ type ResponseRegistry = {
   [K in keyof CommandRegistry]: ResponseHandler<K>;
 };
 
+/**
+ * String used as the top-level key for data stored in localstorage.
+ */
 const LOCALSTORAGE_KEY = "extension/loop_video" as const;
 const DATA_ATTRIBUTE_PREFIX = "data-loopvideo-" as const;
 
@@ -77,6 +80,13 @@ namespace storage {
     const allData: Record<string, unknown> = {};
     allData[LOOPING_DATA_KEY] = data;
     window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
+  }
+
+  /**
+   * Delete all the data, including the key, from the storage.
+   */
+  export function deleteStoredData() {
+    window.localStorage.removeItem(LOCALSTORAGE_KEY);
   }
 }
 
@@ -366,6 +376,14 @@ const _responseHandlers: ResponseRegistry = {
         data: data,
       });
     }
+  },
+
+  delete_domain_data: (message, baseSendResponse) => {
+    storage.deleteStoredData();
+    sendResponse<"delete_domain_data">(baseSendResponse, {
+      success: true,
+      data: null,
+    });
   },
 
   save_data: (message, baseSendResponse) => {

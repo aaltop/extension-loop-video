@@ -156,7 +156,6 @@ export default function App() {
         <summary>Metadata</summary>
         <MetaDataHandler />
       </details>
-
       <hr />
       <TimesTable />
 
