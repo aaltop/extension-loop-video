@@ -10,27 +10,27 @@ export default function Notification() {
   return (
     <div className="notification root wrapper">
       <div
-        tabIndex={isActive ? 0 : -1}
-        className="notification message wrapper"
+        className={`notification message wrapper ${isActive ? "active" : ""}`}
       >
         <span
           aria-live="polite"
-          className={`notification message ${notification.type} ${isActive ? "active" : ""}`}
+          tabIndex={isActive ? 0 : -1}
+          className={`notification message ${notification.type}`}
         >
           {notification.message}
+          {isActive ? (
+            <button
+              className="notification dismiss"
+              type="button"
+              onClick={() => resetNotification()}
+            >
+              Dismiss notification
+            </button>
+          ) : (
+            <div className="notification dismiss"></div>
+          )}
         </span>
       </div>
-      {isActive ? (
-        <button
-          className="notification dismiss"
-          type="button"
-          onClick={() => resetNotification()}
-        >
-          Dismiss notification
-        </button>
-      ) : (
-        <div className="notification dismiss"></div>
-      )}
     </div>
   );
 }

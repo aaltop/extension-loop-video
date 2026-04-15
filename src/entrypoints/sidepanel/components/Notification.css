@@ -2,45 +2,53 @@
 
 
   .notification.message.wrapper {
-      position: relative;
-      min-block-size: 1.5rem;
-      max-block-size: 1.5rem;
-      overflow: hidden;
-      max-inline-size: 100%;
-      min-inline-size: 100%;
+    position: relative;
+    min-block-size: 1.5rem;
+    max-block-size: 1.5rem;
+    overflow: hidden;
+    max-inline-size: 100%;
+    min-inline-size: 100%;
 
-    
+    &.active {
+      outline: 1px solid red;
+
       > .notification.message {
+        visibility: visible;
+        background-color: var(--background-color);
         display: block;
-        background-color: hsl(from var(--background-color) h s l / 0.7);
         text-wrap: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         min-inline-size: 100%;
         max-inline-size: 100%;
-        
-        &.active {
-            border: 1px solid red;
-        }
       }
-    
+
       &:is(:hover, :focus-within) {
         overflow: visible;
-        > .notification.message {
+        outline: none;
+      > .notification.message {
+          display: grid;
+          background-color: hsl(from var(--background-highlight-color) h s l);
+          outline: 1px solid red;
           position: absolute;
           text-wrap: wrap;
           z-index: 1000;
         }
     
       }
+    }
+    
+    > .notification.message {
+      visibility: hidden;
+    }
+    
   }
 
   .notification.dismiss {
     min-block-size: 1.5rem;
     max-block-size: 1.5rem;
-    background-color: var(--background-color);
-    inline-size: 100%;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    inline-size: 80%;
+    justify-self: center;
+    /* border-radius: 0; */
   }
 }
