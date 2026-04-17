@@ -7,7 +7,10 @@ import { commands } from "../commands";
 import { useSavedState } from "../contexts/SavedStateContext";
 import NotificationContext from "../contexts/NotificationContext";
 import { useTimeout } from "../hooks";
-import { NOTIFICATION_TIME_LONG } from "@/src/globals";
+import {
+  NOTIFICATION_TIME_LONG,
+  NOTIFICATION_TIME_MEDIUM,
+} from "@/src/globals";
 import { notificationHighlight } from "./Notification";
 
 const DEFAULT_TEXT = "Load state" as const;
@@ -36,14 +39,16 @@ export default function LoadButton() {
     <button
       className={`load-button wrapper ${notificationHighlight} ${loadedTimeout.state ?? ""}`}
       onClick={async () => {
+        const query = commands.loadData();
+        if (!window.confirm("Load data for URL?")) return;
         logger.debug("Loading data");
-        const response = await commands.loadData();
+        const response = await query;
         handleResponse(response);
         if (response.success) {
           loadedTimeout.activate({
             activationFunction() {
               setButtonText(() => "Loaded!");
-              return { stateValue: "success" };
+              return { stateValue: "success", delay: NOTIFICATION_TIME_MEDIUM };
             },
           });
           savedState.set({
@@ -58,7 +63,7 @@ export default function LoadButton() {
                 message: `Unable to load: ${response.message}`,
                 type: "error",
               });
-              return { stateValue: "failure" };
+              return { stateValue: "failure", delay: NOTIFICATION_TIME_LONG };
             },
           });
         }

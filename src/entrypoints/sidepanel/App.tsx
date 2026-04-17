@@ -145,6 +145,7 @@ export default function App() {
       <button
         type="button"
         onClick={() => {
+          if (!window.confirm("reset?")) return;
           popupData.reset();
           setTabChangeCounter((prev) => prev + 1);
         }}

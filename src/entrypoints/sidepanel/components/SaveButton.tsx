@@ -1,4 +1,7 @@
-import { NOTIFICATION_TIME_LONG } from "@/src/globals";
+import {
+  NOTIFICATION_TIME_LONG,
+  NOTIFICATION_TIME_MEDIUM,
+} from "@/src/globals";
 import { ConsoleContext } from "../contexts/ConsoleContext";
 import { useSavedState } from "../contexts/SavedStateContext";
 import { commands } from "../commands";
@@ -33,6 +36,7 @@ export default function SaveButton() {
     <button
       className={`save-button wrapper ${notificationHighlight} ${savedTimeout.state ?? ""}`}
       onClick={async () => {
+        if (!window.confirm("Save?")) return;
         logger.debug("Saving data");
         const response = await commands.saveData(popupData.get());
         baseHandleResponse(response, logger);
@@ -41,14 +45,14 @@ export default function SaveButton() {
           activationFunction: () => {
             if (response.success) {
               setButtonText(() => "Saved!");
-              return { stateValue: "success" };
+              return { stateValue: "success", delay: NOTIFICATION_TIME_MEDIUM };
             } else {
               setButtonText(() => "Not saved");
               setNotification({
                 message: `Unable to save: ${response.message}`,
                 type: "error",
               });
-              return { stateValue: "failure" };
+              return { stateValue: "failure", delay: NOTIFICATION_TIME_LONG };
             }
           },
         });
