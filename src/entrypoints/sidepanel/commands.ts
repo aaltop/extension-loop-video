@@ -15,6 +15,7 @@ export type CommandString =
   | "load_data"
   | "load_domain_data"
   | "delete_domain_data"
+  | "delete_domain_url_data"
   | "download_data"
   | "load_data_from_file"
   | "enable_looping"
@@ -225,6 +226,23 @@ async function deleteDomainData() {
   });
 }
 
+export interface CommandRegistry {
+  delete_domain_url_data: RequestResponsePair<
+    Request<"delete_domain_url_data", { urls: string[] }>,
+    Response<null>
+  >;
+}
+
+/**
+ * Delete the data of this domain related to the passed urls.
+ */
+async function deleteDomainUrlData(data: { urls: string[] }) {
+  return await sendToTab<"delete_domain_url_data">({
+    command: "delete_domain_url_data",
+    data,
+  });
+}
+
 interface IntervalIdData {
   intervalId: number;
 }
@@ -363,6 +381,7 @@ export const commands = {
   loadData,
   loadDomainData,
   deleteDomainData,
+  deleteDomainUrlData,
   enableLooping,
   disableLooping,
   getLoopIds,

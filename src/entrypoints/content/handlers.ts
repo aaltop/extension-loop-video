@@ -88,6 +88,18 @@ namespace storage {
   export function deleteStoredData() {
     window.localStorage.removeItem(LOCALSTORAGE_KEY);
   }
+
+  /**
+   * Delete data for the specified urls for the current domain.
+   */
+  export function deleteStoredDataForUrls(urls: string[]) {
+    const data = getStoredData()?.loopingData;
+    if (data === undefined) return;
+    for (const url of urls) {
+      delete data[url];
+    }
+    setStoredData({ loopingData: data });
+  }
 }
 
 /**
@@ -381,6 +393,14 @@ const _responseHandlers: ResponseRegistry = {
   delete_domain_data: (message, baseSendResponse) => {
     storage.deleteStoredData();
     sendResponse<"delete_domain_data">(baseSendResponse, {
+      success: true,
+      data: null,
+    });
+  },
+
+  delete_domain_url_data: (message, baseSendResponse) => {
+    storage.deleteStoredDataForUrls(message.data.urls);
+    sendResponse<"delete_domain_url_data">(baseSendResponse, {
       success: true,
       data: null,
     });
