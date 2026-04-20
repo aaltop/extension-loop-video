@@ -6,8 +6,13 @@ import { NotificationContextProvider } from "./NotificationContext";
 import { SavedStateProvider } from "./SavedStateContext";
 import { ConsoleContextProvider } from "./ConsoleContext";
 import { JSX } from "react";
+import { DomainDataContextProvider } from "./DomainDataContext";
 
-const providers = [SavedStateProvider, ConsoleContextProvider];
+const providers = [
+  SavedStateProvider,
+  DomainDataContextProvider,
+  ConsoleContextProvider,
+];
 
 export default function Provider({ children }: { children: React.ReactNode }) {
   let child: JSX.Element = (

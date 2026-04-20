@@ -1,68 +1,20 @@
-import { commands, DomainData, URLMetaData } from "../commands";
+import { use } from "react";
+import { commands } from "../commands";
 import { ConsoleContext } from "../contexts/ConsoleContext";
+import DomainDataContext from "../contexts/DomainDataContext";
 import { handleResponse } from "../helpers";
 import { useCheckedMap } from "../hooks";
 import ButtonRow from "./ButtonRow";
-
-interface CombinedMetaData extends URLMetaData {
-  url: string;
-}
-
-function useURLMetaData(): {
-  data: CombinedMetaData[];
-  tagSet: Set<string>;
-  update: () => Promise<void>;
-} {
-  const [domainData, setDomainData] = useState<DomainData>({ loopingData: {} });
-  const { logger } = useContext(ConsoleContext);
-
-  // make a list of the data, flattening the url to be with the data
-  const data = useMemo<CombinedMetaData[]>(() => {
-    return Object.entries(domainData.loopingData).map(([url, dat]) => {
-      return { ...dat, url };
-    });
-  }, [domainData]);
-
-  // create a set out of the tags
-  const tagSet = useMemo<Set<string>>(() => {
-    const allTags = Object.entries(data).flatMap(([_, { tags }]) => {
-      if (!tags) return [];
-
-      return tags;
-    });
-    return new Set(allTags);
-  }, [data]);
-
-  /**
-   * Update the domain data.
-   */
-  async function update() {
-    const response = await commands.loadDomainData();
-    if (!response.success) {
-      setDomainData(() => {
-        return { loopingData: {} };
-      });
-    } else {
-      setDomainData(() => response.data);
-    }
-  }
-
-  return {
-    data,
-    tagSet,
-    update,
-  };
-}
 
 export default function DomainDataView() {
   const [textFilter, setTextFilter] = useState<string>("");
   const tagMap = useCheckedMap<string>({ defaultValue: null });
   const urlDataMap = useCheckedMap<string>({ defaultValue: null });
-  const urlData = useURLMetaData();
-  const { logger } = useContext(ConsoleContext);
+  const domainData = use(DomainDataContext);
+  const { logger } = use(ConsoleContext);
 
   useEffect(() => {
-    urlData.update();
+    domainData.update();
   }, []);
 
   return (
@@ -77,15 +29,15 @@ export default function DomainDataView() {
       <button
         type="button"
         onClick={async () => {
-          await urlData.update();
+          await domainData.update();
         }}
       >
-        update
+        Update
       </button>
       <details>
         <summary>Tags</summary>
         <ul style={{ display: "flex" }}>
-          {urlData.tagSet.values().map((tag) => {
+          {domainData.tagSet.values().map((tag) => {
             return (
               <li style={{ listStyle: "none" }} key={tag}>
                 <label>
@@ -102,7 +54,7 @@ export default function DomainDataView() {
         </ul>
       </details>
       <ul>
-        {urlData.data.map(({ url, ...val }) => {
+        {domainData.metadata.map(({ url, ...val }) => {
           /**
            * Whether this entry has each of the chosen tags.
            */
@@ -147,7 +99,7 @@ export default function DomainDataView() {
           onClick={async () => {
             if (window.confirm("Delete all domain data?")) {
               await commands.deleteDomainData();
-              urlData.update();
+              domainData.update();
             }
           }}
         >
@@ -167,7 +119,7 @@ export default function DomainDataView() {
               handleResponse(response, logger);
               // assume success
               urlDataMap.clear();
-              urlData.update();
+              domainData.update();
             }
           }}
         >
