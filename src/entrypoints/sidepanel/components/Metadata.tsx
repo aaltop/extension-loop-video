@@ -1,11 +1,14 @@
 /**
  * @file Inputs for setting a URL's metadata.
  */
+import { use, useId } from "react";
+
 import {
   useTitle,
   useDescription,
   useTags,
 } from "../contexts/SavedStateContext";
+import DomainDataContext from "../contexts/DomainDataContext";
 
 import "./Metadata.css";
 
@@ -95,9 +98,12 @@ function Description() {
 }
 
 function Tags() {
+  const allTagsDatalistId = useId();
+
   const [newTag, setNewTag] = useState<string>("");
   const [modify, setModify] = useState<boolean>(false);
   const [deleteTags, setDeleteTags] = useState<string[]>(() => []);
+  const { tagSet: globalTags } = use(DomainDataContext);
   const tags = useTags();
 
   const tagsItems = tags
@@ -139,6 +145,7 @@ function Tags() {
       New Tag
       <input
         type="text"
+        list={allTagsDatalistId}
         value={newTag}
         onChange={(ev) => {
           const newValue = ev.target.value;
@@ -162,8 +169,8 @@ function Tags() {
   );
 
   return (
-    <div>
-      <fieldset className="metadata tags">
+    <div className="metadata-tags-wrapper">
+      <fieldset className="metadata-tags">
         <legend>Tags</legend>
         <button
           type="button"
@@ -173,7 +180,7 @@ function Tags() {
           {modify ? "lock" : "modify"}
         </button>
         <button
-          className={`metadata delete-tags ${modify ? "" : "global-hidden"}`}
+          className={`metadata-delete-tags ${modify ? "" : "global-hidden"}`}
           type="button"
           disabled={deleteTags.length < 1}
           onClick={() => {
@@ -189,6 +196,13 @@ function Tags() {
         </button>
         <ul>{tagsItems}</ul>
       </fieldset>
+
+      <datalist id={allTagsDatalistId}>
+        {globalTags.values().map((tag) => {
+          return <option key={tag} value={tag}></option>;
+        })}
+      </datalist>
+
       <div>{addTag}</div>
     </div>
   );
@@ -200,7 +214,7 @@ export default function MetaDataHandler() {
   const tags = useTags();
 
   return (
-    <div className="metadata wrapper">
+    <div className="metadata-wrapper">
       <Title />
       <Description />
       <Tags />

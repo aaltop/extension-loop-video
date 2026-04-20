@@ -1,7 +1,12 @@
-.metadata.wrapper {
+.metadata-wrapper {
   display: flex;
   flex-direction: column;
   row-gap: 0.5rem;
+
+  datalist {
+    display: none;
+  }
+
   .metadata-input {
     margin-block-end: 1.0rem;
   }
@@ -10,7 +15,7 @@
     text-decoration: underline red 2px;
   }
   
-  .metadata.tags {
+  .metadata-tags {
     padding-inline: 1rem;
     margin-block: 0.5rem;
     border: 1px solid var(--text-color);
