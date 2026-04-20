@@ -20,6 +20,7 @@ import { Response } from "@/src/typing/commands";
 import Notification from "./components/Notification.tsx";
 import { NotificationContextProvider } from "./contexts/NotificationContext";
 import LoadButton from "./components/LoadButton";
+import DomainDataContext from "./contexts/DomainDataContext.tsx";
 
 /**
  * Component containing general controls.
@@ -129,15 +130,35 @@ function Controls() {
 }
 
 export default function App() {
-  const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
-  const { log, logger } = useContext(ConsoleContext);
   const popupData = useSavedState();
+  const { update: updateDomainData } = use(DomainDataContext);
+
+  const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
 
   useEffect(() => {
     async function execute() {
       await commands.logMessage("Hello from Loop Video!");
     }
     execute();
+  }, []);
+
+  useEffect(() => {
+    async function synchronize(
+      _message: any,
+      sender: Browser.runtime.MessageSender,
+    ) {
+      if (sender.tab) {
+        const message = _message as SyncMessage;
+        if (message?.event) {
+          updateDomainData();
+        }
+      }
+    }
+
+    browser.runtime.onMessage.addListener(synchronize);
+    return () => {
+      browser.runtime.onMessage.removeListener(synchronize);
+    };
   }, []);
 
   return (

@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { commands, DomainData, URLMetaData } from "../commands";
 
 /**
- * Exposes some of the data of the domain in a accessible format.
+ * Exposes some of the data of the domain in an accessible format.
  */
 const DomainDataContext = createContext<ContextState>(
   createDefaultContextState(),

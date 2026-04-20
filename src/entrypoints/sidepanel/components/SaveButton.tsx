@@ -12,6 +12,7 @@ import "./Savebutton.css";
 import NotificationContext from "../contexts/NotificationContext";
 import { use } from "react";
 import { notificationHighlight } from "./Notification";
+import DomainDataContext from "../contexts/DomainDataContext";
 
 const DEFAULT_TEXT = "Save state" as const;
 
@@ -20,6 +21,7 @@ export default function SaveButton() {
 
   const { logger } = useContext(ConsoleContext);
   const { set: setNotification } = use(NotificationContext);
+  const { update: updateDomainData } = use(DomainDataContext);
   const savedTimeout = useTimeout<"success" | "failure">({
     deactivationDelay: NOTIFICATION_TIME_LONG,
     activationFunction: () => {
@@ -45,6 +47,7 @@ export default function SaveButton() {
           activationFunction: () => {
             if (response.success) {
               setButtonText(() => "Saved!");
+              updateDomainData();
               return { stateValue: "success", delay: NOTIFICATION_TIME_MEDIUM };
             } else {
               setButtonText(() => "Not saved");
