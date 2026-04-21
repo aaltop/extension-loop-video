@@ -24,6 +24,7 @@ import Notification from "./components/Notification.tsx";
 import { NotificationContextProvider } from "./contexts/NotificationContext";
 import LoadButton from "./components/LoadButton";
 import DomainDataContext from "./contexts/DomainDataContext.tsx";
+import Dropdown from "./components/Dropdown.tsx";
 
 /**
  * Component containing general controls.
@@ -167,31 +168,42 @@ export default function App() {
 
   return (
     <div key={tabChangeCounter} className="app wrapper input-with-button">
-      <ButtonRow>
-        <button
-          type="button"
-          onClick={() => {
-            if (!window.confirm("reset?")) return;
-            popupData.reset();
-            setTabChangeCounter((prev) => prev + 1);
-          }}
-        >
-          Reset state (reload)
-        </button>
-        <button
-          type="button"
-          onClick={async () => {
-            const message =
-              "Upgrade data version? this will make the current domain's data's version compatible " +
-              "with the current application version. Be sure to backup the data before doing this.";
-            if (!window.confirm(message)) return;
-            const response = await commands.upgradeDomainData();
-            handleResponse(response, logger);
-          }}
-        >
-          Upgrade data version
-        </button>
-      </ButtonRow>
+      <Dropdown
+        title="Menu"
+        PopoverElement={({ popoverId, itemClassName }) => {
+          const menuItemClass = `global-basic-button ${itemClassName}`;
+          return (
+            <div className="app-menu-wrapper" popover="auto" id={popoverId}>
+              <button
+                className={menuItemClass}
+                type="button"
+                onClick={() => {
+                  if (!window.confirm("reset?")) return;
+                  popupData.reset();
+                  setTabChangeCounter((prev) => prev + 1);
+                }}
+              >
+                Reset state (reload)
+              </button>
+
+              <button
+                className={menuItemClass}
+                type="button"
+                onClick={async () => {
+                  const message =
+                    "Upgrade data version? this will make the current domain's data's version compatible " +
+                    "with the current application version. Be sure to backup the data before doing this.";
+                  if (!window.confirm(message)) return;
+                  const response = await commands.upgradeDomainData();
+                  handleResponse(response, logger);
+                }}
+              >
+                Upgrade data version
+              </button>
+            </div>
+          );
+        }}
+      />
       <h1>Loop Video</h1>
       <details>
         <summary>Metadata</summary>

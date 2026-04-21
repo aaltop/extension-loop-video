@@ -1,0 +1,30 @@
+.dropdown-wrapper {
+  
+
+  .dropdown-toggle {
+    padding-inline: 0.5rem;
+  }
+
+  [popover] {
+
+    &:popover-open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    margin: 0;
+    inset: auto;
+    inset-inline-start: anchor(self-start);
+    inset-block-start: anchor(end);
+    width: max(anchor-size(width), fit-content);
+  }
+
+  /* Item in the menu */
+  .dropdown-menu-item {
+    border: none;
+    padding-block: 0.5rem;
+    &:is(:focus-within, :hover) {
+      background-color: var(--background-highlight-color);
+    }
+  }
+}

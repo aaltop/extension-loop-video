@@ -1,6 +1,6 @@
 :root {
     --background-color: hsl(from blue h calc(s - 90) calc(l - 27));
-    --background-highlight-color: hsl(from var(--background-color) h s calc(l + 4));
+    --background-highlight-color: hsl(from var(--background-color) h s calc(l + 8));
     /* to set objects (buttons etc) apart from the background (body) */
     --foreground-color: hsl(from var(--background-color) h s calc(l - 4));
     --text-color: hsl(from white h s calc(l - 10));
@@ -17,6 +17,15 @@
 
 .global-hidden {
   display: none;
+}
+
+.global-basic-button {
+  border-radius: 0;
+}
+
+.global-flex-row {
+  display: flex;
+  flex-direction: row;
 }
 
 /* GLOBAL STYLES */

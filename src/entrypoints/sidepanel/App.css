@@ -28,3 +28,8 @@ button.loop-toggle {
 div.highlight {
   display: flex;
 }
+
+.app-menu-wrapper {
+  border: 1px solid var(--text-color);
+  border-bottom-right-radius: 0.5rem;
+}
