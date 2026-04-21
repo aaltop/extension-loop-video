@@ -1,5 +1,6 @@
 import {
   CommandRegistry,
+  DOMAIN_DATA_VERSION,
   DomainData,
   URLData,
 } from "@/entrypoints/sidepanel/commands";
@@ -50,19 +51,69 @@ namespace storage {
     return `${LOCALSTORAGE_KEY}/${suffix}`;
   }
 
+  // TODO: should probably be co-located with the domain data typing itself.
+  /**
+   * Depending on the version of the domain data, upgrade it to the most
+   * recent version, if possible without breaking anything.
+   */
+  export function upgradeData(data: any):
+    | {
+        /**
+         * Whether the upgrade was successful.
+         */
+        success: true;
+        /**
+         * The upgraded data.
+         */
+        data: DomainData;
+      }
+    | {
+        /**
+         * Whether the upgrade was successful.
+         */
+        success: false;
+        /**
+         * Info about why the upgrade failed.
+         */
+        message: string;
+      } {
+    if (data === undefined || data === null) {
+      return { success: false, message: "Data not found" };
+    } else if (typeof data !== "object") {
+      return {
+        success: false,
+        message: "Wrong type for data, expected object",
+      };
+    }
+    if (!data["version"]) {
+      data["version"] = "v1";
+    }
+    const domainData = data as DomainData;
+    return { success: true, data: domainData };
+  }
+
   /**
    * Whether the parsed stored data is valid.
    */
   export function storedDataIsValid(data: any) {
     return data !== null && typeof data === "object";
   }
+
+  /**
+   * Get the stored data of the domain without performing any validation.
+   */
+  export function getStoredDataRaw(): any {
+    const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
+    let parsedData = JSON.parse(data ?? "null");
+    return parsedData;
+  }
+
   /**
    * Get the stored data of the extension for this domain.
    */
   export function getStoredData(): DomainData | undefined {
-    const data = window.localStorage.getItem(LOCALSTORAGE_KEY);
-    let parsedData = JSON.parse(data ?? "null");
-    return storedDataIsValid(parsedData) ? parsedData : undefined;
+    const data = getStoredDataRaw();
+    return storedDataIsValid(data) ? data : undefined;
   }
 
   /**
@@ -77,8 +128,6 @@ namespace storage {
    * Set the stored data for this domain.
    */
   export function setStoredData(data: DomainData) {
-    const allData: Record<string, unknown> = {};
-    allData[LOOPING_DATA_KEY] = data;
     window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
   }
 
@@ -98,7 +147,7 @@ namespace storage {
     for (const url of urls) {
       delete data[url];
     }
-    setStoredData({ loopingData: data });
+    setStoredData({ loopingData: data, version: DOMAIN_DATA_VERSION });
   }
 }
 
@@ -406,13 +455,30 @@ const _responseHandlers: ResponseRegistry = {
     });
   },
 
+  upgrade_domain_data: (message, baseSendResponse) => {
+    const data = storage.getStoredDataRaw();
+    const upgraded = storage.upgradeData(data);
+    if (upgraded.success) {
+      storage.setStoredData(upgraded.data);
+      sendResponse<"upgrade_domain_data">(baseSendResponse, {
+        success: true,
+        data: null,
+      });
+    } else {
+      sendResponse<"upgrade_domain_data">(baseSendResponse, {
+        success: false,
+        message: upgraded.message,
+      });
+    }
+  },
+
   save_data: (message, baseSendResponse) => {
     logger.log("saving data...");
 
     const url = document.URL;
     let previousData = storage.getStoredData();
     if (previousData === undefined) {
-      previousData = { loopingData: {} };
+      previousData = { loopingData: {}, version: DOMAIN_DATA_VERSION };
     }
     previousData.loopingData[url] = message.data;
 
@@ -426,7 +492,7 @@ const _responseHandlers: ResponseRegistry = {
   download_data: (message, baseSendResponse) => {
     let data = storage.getStoredData();
     if (data === undefined) {
-      data = { loopingData: {} };
+      data = { loopingData: {}, version: "v1" };
     }
 
     const blob = new Blob([JSON.stringify(data)], {

@@ -6,7 +6,10 @@ import { commands } from "./commands";
 import { useSavedState } from "./contexts/SavedStateContext";
 import { ConsoleContext } from "./contexts/ConsoleContext";
 import { SyncMessage } from "../content/typing";
-import { handleResponse as baseHandleResponse } from "./helpers";
+import {
+  handleResponse as baseHandleResponse,
+  handleResponse,
+} from "./helpers";
 
 import TimesTable from "./components/TimesTable";
 import DomainDataView from "./components/DomainDataView";
@@ -132,6 +135,7 @@ function Controls() {
 export default function App() {
   const popupData = useSavedState();
   const { update: updateDomainData } = use(DomainDataContext);
+  const { logger } = use(ConsoleContext);
 
   const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
 
@@ -163,16 +167,31 @@ export default function App() {
 
   return (
     <div key={tabChangeCounter} className="app wrapper input-with-button">
-      <button
-        type="button"
-        onClick={() => {
-          if (!window.confirm("reset?")) return;
-          popupData.reset();
-          setTabChangeCounter((prev) => prev + 1);
-        }}
-      >
-        Reset state (reload)
-      </button>
+      <ButtonRow>
+        <button
+          type="button"
+          onClick={() => {
+            if (!window.confirm("reset?")) return;
+            popupData.reset();
+            setTabChangeCounter((prev) => prev + 1);
+          }}
+        >
+          Reset state (reload)
+        </button>
+        <button
+          type="button"
+          onClick={async () => {
+            const message =
+              "Upgrade data version? this will make the current domain's data's version compatible " +
+              "with the current application version. Be sure to backup the data before doing this.";
+            if (!window.confirm(message)) return;
+            const response = await commands.upgradeDomainData();
+            handleResponse(response, logger);
+          }}
+        >
+          Upgrade data version
+        </button>
+      </ButtonRow>
       <h1>Loop Video</h1>
       <details>
         <summary>Metadata</summary>

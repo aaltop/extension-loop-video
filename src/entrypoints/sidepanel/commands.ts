@@ -16,6 +16,7 @@ export type CommandString =
   | "load_domain_data"
   | "delete_domain_data"
   | "delete_domain_url_data"
+  | "upgrade_domain_data"
   | "download_data"
   | "load_data_from_file"
   | "enable_looping"
@@ -97,7 +98,12 @@ export interface URLData extends LoopInfo, URLMetaData {}
  * Key under which the looping data is stored for the domain.
  */
 export const LOOPING_DATA_KEY = "loopingData" as const;
+/**
+ * The version of the domain data.
+ */
+export const DOMAIN_DATA_VERSION = "v1" as const;
 export interface DomainData {
+  version: "v1";
   loopingData: Record<string, URLData>;
 }
 
@@ -355,6 +361,23 @@ async function loadDataFromFile() {
 }
 
 export interface CommandRegistry {
+  upgrade_domain_data: RequestResponsePair<
+    Request<"upgrade_domain_data", null>,
+    Response<null>
+  >;
+}
+
+/**
+ * Migrate the domain data that is in storage to the most up-to-date version.
+ */
+async function upgradeDomainData() {
+  return await sendToTab<"upgrade_domain_data">({
+    command: "upgrade_domain_data",
+    data: null,
+  });
+}
+
+export interface CommandRegistry {
   get_loop_ids: RequestResponsePair<
     Request<"get_loop_ids", null>,
     Response<{ loopIds: number[] }>
@@ -382,6 +405,7 @@ export const commands = {
   loadDomainData,
   deleteDomainData,
   deleteDomainUrlData,
+  upgradeDomainData,
   enableLooping,
   disableLooping,
   getLoopIds,
