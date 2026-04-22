@@ -12,6 +12,7 @@ import {
   NOTIFICATION_TIME_MEDIUM,
 } from "@/src/globals";
 import { notificationHighlight } from "./Notification";
+import { usePreferConfirm } from "../contexts/AppSettingsContext";
 
 const DEFAULT_TEXT = "Load state" as const;
 
@@ -20,6 +21,7 @@ export default function LoadButton() {
 
   const { logger } = use(ConsoleContext);
   const savedState = useSavedState();
+  const preferConfirm = usePreferConfirm();
   const { set: setNotification } = use(NotificationContext);
   const loadedTimeout = useTimeout<"success" | "failure">({
     activationFunction() {
@@ -40,7 +42,8 @@ export default function LoadButton() {
       className={`load-button wrapper ${notificationHighlight} ${loadedTimeout.state ?? ""}`}
       onClick={async () => {
         const query = commands.loadData();
-        if (!window.confirm("Load data for URL?")) return;
+        if (preferConfirm.get() && !window.confirm("Load data for URL?"))
+          return;
         logger.debug("Loading data");
         const response = await query;
         handleResponse(response);

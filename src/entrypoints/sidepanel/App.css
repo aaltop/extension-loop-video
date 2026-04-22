@@ -33,3 +33,9 @@ div.highlight {
   border: 1px solid var(--text-color);
   border-bottom-right-radius: 0.5rem;
 }
+
+
+.app-menubar-wrapper {
+  display: flex;
+  flex-direction: row;
+}

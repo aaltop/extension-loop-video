@@ -14,5 +14,11 @@ export default defineConfig({
     icons: Object.fromEntries(
       [16, 24, 48, 96, 128].map((elem) => [elem, "/icon.svg"]),
     ),
+    permissions: ["storage"],
+    browser_specific_settings: {
+      gecko: {
+        id: "@loop_video.aaltop",
+      },
+    },
   },
 });

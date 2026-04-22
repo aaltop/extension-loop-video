@@ -13,6 +13,7 @@ import NotificationContext from "../contexts/NotificationContext";
 import { use } from "react";
 import { notificationHighlight } from "./Notification";
 import DomainDataContext from "../contexts/DomainDataContext";
+import { usePreferConfirm } from "../contexts/AppSettingsContext";
 
 const DEFAULT_TEXT = "Save state" as const;
 
@@ -22,6 +23,7 @@ export default function SaveButton() {
   const { logger } = useContext(ConsoleContext);
   const { set: setNotification } = use(NotificationContext);
   const { update: updateDomainData } = use(DomainDataContext);
+  const preferConfirm = usePreferConfirm();
   const savedTimeout = useTimeout<"success" | "failure">({
     deactivationDelay: NOTIFICATION_TIME_LONG,
     activationFunction: () => {
@@ -38,7 +40,7 @@ export default function SaveButton() {
     <button
       className={`save-button wrapper ${notificationHighlight} ${savedTimeout.state ?? ""}`}
       onClick={async () => {
-        if (!window.confirm("Save?")) return;
+        if (preferConfirm.get() && !window.confirm("Save?")) return;
         logger.debug("Saving data");
         const response = await commands.saveData(popupData.get());
         baseHandleResponse(response, logger);

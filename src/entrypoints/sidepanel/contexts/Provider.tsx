@@ -7,10 +7,12 @@ import { SavedStateProvider } from "./SavedStateContext";
 import { ConsoleContextProvider } from "./ConsoleContext";
 import { JSX } from "react";
 import { DomainDataContextProvider } from "./DomainDataContext";
+import { AppSettingsContextProvider } from "./AppSettingsContext";
 
 const providers = [
   SavedStateProvider,
   DomainDataContextProvider,
+  AppSettingsContextProvider,
   ConsoleContextProvider,
 ];
 
