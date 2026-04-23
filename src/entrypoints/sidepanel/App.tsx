@@ -5,7 +5,7 @@ import "@/entrypoints/sidepanel/mixins.css";
 import { commands } from "./commands";
 import { useSavedState } from "./contexts/SavedStateContext";
 import { ConsoleContext } from "./contexts/ConsoleContext";
-import { SyncMessage } from "../content/typing";
+import { syncMessageSchema } from "../content/typing";
 import { handleResponse as baseHandleResponse } from "./helpers";
 
 import TimesTable from "./components/TimesTable";
@@ -51,8 +51,8 @@ function Controls() {
       sender: Browser.runtime.MessageSender,
     ) {
       if (sender.tab) {
-        const message = _message as SyncMessage;
-        if (message?.event) {
+        const message = syncMessageSchema.safeParse(_message);
+        if (message.success) {
           init();
         }
       }
@@ -152,8 +152,8 @@ export default function App() {
       sender: Browser.runtime.MessageSender,
     ) {
       if (sender.tab) {
-        const message = _message as SyncMessage;
-        if (message?.event) {
+        const message = syncMessageSchema.safeParse(_message);
+        if (message.success) {
           updateDomainData();
         }
       }

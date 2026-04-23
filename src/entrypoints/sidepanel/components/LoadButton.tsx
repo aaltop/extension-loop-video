@@ -16,6 +16,10 @@ import { usePreferConfirm } from "../contexts/AppSettingsContext";
 
 const DEFAULT_TEXT = "Load state" as const;
 
+// TODO: could potentially consolidate the behaviour here with the one
+// of the SaveButton. Very similar, but also gets to that point
+// of potentially far too many props passed to have it have enough
+// usability.
 export default function LoadButton() {
   const [buttonText, setButtonText] = useState<string>(DEFAULT_TEXT);
 

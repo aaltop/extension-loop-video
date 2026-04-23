@@ -2,6 +2,8 @@
  * @file Definitions of saved data.
  */
 
+import * as z from "zod";
+
 /**
  * Info about the loopable element.
  */
@@ -16,6 +18,10 @@ export interface LoopableInfo {
    */
   selectors: string;
 }
+const loopableInfoSchema = z.object({
+  loopableIndex: z.number(),
+  selectors: z.string(),
+});
 
 export interface TimeSection {
   startTime: number;
@@ -28,6 +34,12 @@ export interface TimeSection {
   disabled?: boolean;
   description?: string;
 }
+const timeSectionSchema = z.object({
+  startTime: z.number(),
+  endTime: z.number(),
+  disabled: z.boolean().optional(),
+  description: z.string().optional(),
+});
 
 /**
  * Describes a video (or similar) loop.
@@ -35,6 +47,10 @@ export interface TimeSection {
 export interface LoopInfo extends LoopableInfo {
   timeSections: TimeSection[];
 }
+const loopInfoSchema = z.object({
+  ...loopableInfoSchema.shape,
+  timeSections: z.array(timeSectionSchema),
+});
 
 /**
  * Metadata related to a specific URL.
@@ -53,12 +69,25 @@ export interface URLMetaData {
    */
   tags?: string[];
 }
+const urlMetaDataSchema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    tags: z.string().array(),
+  })
+  .partial();
 
 /**
  * The data related to a specific URL.
  */
 export interface URLData extends LoopInfo, URLMetaData {}
-
+/**
+ * Schema for {@link URLData}.
+ */
+export const urlDataSchema = z.object({
+  ...loopInfoSchema.shape,
+  ...urlMetaDataSchema.shape,
+});
 /**
  * Key under which the looping data is stored for the domain.
  */
@@ -71,3 +100,7 @@ export interface DomainData {
   version: "v1";
   loopingData: Record<string, URLData>;
 }
+export const domainDataSchema = z.object({
+  version: z.literal(DOMAIN_DATA_VERSION),
+  loopingData: z.record(z.httpUrl(), urlDataSchema),
+});

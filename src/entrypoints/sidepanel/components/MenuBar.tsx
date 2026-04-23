@@ -21,6 +21,7 @@ export default function MenuBar({
   const { logger } = use(ConsoleContext);
   const preferConfirm = usePreferConfirm();
 
+  // TODO: change to proper menu html elements
   return (
     <div className="menubar-wrapper">
       <Dropdown
