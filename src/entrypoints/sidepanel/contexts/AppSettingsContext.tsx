@@ -4,6 +4,10 @@
 
 import { trycatch } from "@/src/error";
 import { createContext, use } from "react";
+import {
+  hookFactory as baseHookFactory,
+  HookFactoryArgs,
+} from "../contextHookFactory";
 
 const settingsStorage = browser.storage.sync;
 
@@ -71,15 +75,27 @@ export function AppSettingsContextProvider({
   );
 }
 
-export function usePreferConfirm() {
-  const settings = use(AppSettingsContext);
+function hookFactory<T, K extends keyof Settings, E extends object = object>(
+  args: Omit<
+    HookFactoryArgs<T, Settings, Pick<Settings, K>, E>,
+    "contextState"
+  >,
+) {
+  return baseHookFactory({ ...args, contextState: AppSettingsContext });
+}
 
-  return {
-    get() {
-      return settings.state.preferConfirm;
-    },
-    set(newValue: boolean) {
-      settings.setState({ ...settings.state, preferConfirm: newValue });
-    },
-  };
+const _usePreferConfirm = hookFactory<boolean, "preferConfirm">({
+  createNewState(_prevState, newValue) {
+    return { preferConfirm: newValue };
+  },
+  getFromState(state) {
+    return state.preferConfirm;
+  },
+});
+
+/**
+ * See {@link Settings.preferConfirm}.
+ */
+export function usePreferConfirm() {
+  return _usePreferConfirm({ args: {} });
 }
