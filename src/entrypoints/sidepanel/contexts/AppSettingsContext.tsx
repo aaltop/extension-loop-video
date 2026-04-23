@@ -3,7 +3,7 @@
  */
 
 import { trycatch } from "@/src/error";
-import { createContext, use } from "react";
+import { createContext } from "react";
 import {
   hookFactory as baseHookFactory,
   HookFactoryArgs,
@@ -30,7 +30,7 @@ interface ContextState {
 function createDefaultContextState(): ContextState {
   return {
     state: { preferConfirm: true },
-    setState(newState) {
+    setState(_newState) {
       throw new Error("Should not be called");
     },
   };
@@ -57,10 +57,9 @@ export function AppSettingsContextProvider({
   }
 
   useEffect(() => {
-    async function execute() {
+    trycatch(async () => {
       setState(await settingsStorage.get<Settings>({ preferConfirm: true }));
-    }
-    execute();
+    });
   }, []);
 
   return (
