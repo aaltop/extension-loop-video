@@ -1,0 +1,9 @@
+.menubar-wrapper {
+  display: flex;
+  flex-direction: row;
+  
+  .menubar-menu-wrapper {
+    border: 1px solid var(--text-color);
+    border-bottom-right-radius: 0.5rem;
+  }
+}
