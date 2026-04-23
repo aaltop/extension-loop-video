@@ -1,4 +1,4 @@
-import { LoopInfo, TimeSection } from "../sidepanel/commands";
+import { TimeSection } from "@/src/typing/data";
 
 export type Skippable = Pick<HTMLMediaElement, "currentTime" | "pause">;
 

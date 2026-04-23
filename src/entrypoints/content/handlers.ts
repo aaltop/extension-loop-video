@@ -1,12 +1,7 @@
-import {
-  CommandRegistry,
-  DOMAIN_DATA_VERSION,
-  DomainData,
-  URLData,
-} from "@/entrypoints/sidepanel/commands";
+import { DOMAIN_DATA_VERSION, DomainData, URLData } from "@/src/typing/data";
+import { CommandRegistry } from "@/entrypoints/sidepanel/commands";
 import logger from "@/src/logger";
 import { playSections } from "./skipping";
-import { LOOPING_DATA_KEY } from "@/entrypoints/sidepanel/commands";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,

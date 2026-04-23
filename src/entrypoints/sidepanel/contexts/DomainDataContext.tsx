@@ -1,5 +1,11 @@
 import { createContext } from "react";
-import { commands, DomainData, URLMetaData } from "../commands";
+
+import { commands } from "../commands";
+import {
+  DOMAIN_DATA_VERSION,
+  DomainData,
+  URLMetaData,
+} from "@/src/typing/data";
 
 /**
  * Exposes some of the data of the domain in an accessible format.
@@ -40,7 +46,10 @@ export function DomainDataContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [domainData, setDomainData] = useState<DomainData>({ loopingData: {} });
+  const [domainData, setDomainData] = useState<DomainData>({
+    loopingData: {},
+    version: DOMAIN_DATA_VERSION,
+  });
 
   const metadata = useMemo<CombinedMetaData[]>(() => {
     return Object.entries(domainData.loopingData).map(([url, dat]) => {
@@ -63,7 +72,7 @@ export function DomainDataContextProvider({
     const response = await commands.loadDomainData();
     if (!response.success) {
       setDomainData(() => {
-        return { loopingData: {} };
+        return { loopingData: {}, version: DOMAIN_DATA_VERSION };
       });
     } else {
       setDomainData(() => response.data);

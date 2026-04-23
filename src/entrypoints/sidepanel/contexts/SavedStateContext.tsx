@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { URLData } from "@/entrypoints/sidepanel/commands";
+import { URLData } from "@/src/typing/data";
 import { ValueState } from "@/src/typing/state";
 import {
   HookFactoryArgs,
