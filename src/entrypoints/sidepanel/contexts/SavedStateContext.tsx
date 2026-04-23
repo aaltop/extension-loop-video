@@ -1,6 +1,12 @@
 import { createContext } from "react";
 import { URLData } from "@/entrypoints/sidepanel/commands";
 import { ValueState } from "@/src/typing/state";
+import {
+  HookFactoryArgs,
+  ContextHook,
+  ContextHookArgs,
+  hookFactory as baseHookFactory,
+} from "../contextHookFactory";
 
 interface SavedStateAccessor {
   state: URLData;
@@ -46,94 +52,6 @@ export function SavedStateProvider({
   );
 }
 
-interface Permissions {
-  set?: boolean;
-}
-
-interface ContextHookArgs {}
-
-/**
- * Hook for accessing particular parts of the state of a context.
- * @template T The value that is handled.
- * @template E Arguments passed to the hook.
- */
-type ContextHook<T, E extends object = object> = ({
-  args,
-}: {
-  /**
-   * Arguments passed to the hook that pertain to a specific hook.
-   */
-  readonly args: E;
-  // currently not used, but have it here so its purpose is obvious
-  hookArgs?: ContextHookArgs;
-}) => ValueState<T>;
-
-/**
- * @template T Returned by the getter, set by the setter.
- * @template K Key of property in the save data that is needed
- * for updating this value, if previous data is needed.
- * @template E Arguments passed to the hook and further to handlers;
- * any data that would be relevant for the hook that is not present
- * in the context.
- */
-interface HookFactoryArgs<
-  T,
-  K extends keyof URLData,
-  E extends object = object,
-> {
-  /**
-   * Given the state, returns the relevant value.
-   * @param state The state.
-   * @param hookArgs Arguments passed to the hook during its creation.
-   */
-  getFromState: (state: Pick<URLData, K>, hookArgs: E) => T;
-
-  /**
-   * Given the previous state of a relevant property and a new value for
-   * that property (or some part of it), return an updated property.
-   * @param prevState The (soon to be) previous state.
-   * @param newValue The new value.
-   * @param hookArgs Arguments passed to the hook during its creation.
-   */
-  createNewState: (
-    prevState: Pick<URLData, K>,
-    newValue: T,
-    hookArgs: E,
-  ) => Pick<URLData, K>;
-}
-
-/**
- * Factory for creating hooks for accessing the context.
- * @template T The type handled by the hook.
- * @template K Key used to limit access to the context state. Specify
- * the key of the property that is relevant for this hook.
- * @template E Arguments needed for the hook itself.
- */
-function hookFactory<T, K extends keyof URLData, E extends object = object>(
-  args: HookFactoryArgs<T, K, E>,
-): ContextHook<T, E> {
-  return function contextHook(contextHookArgs) {
-    const { state, setState } = useContext(SavedStateContext);
-
-    // quick-and-dirty deep copy
-    function copy<T>(state: T): T {
-      return JSON.parse(JSON.stringify(state));
-    }
-
-    return {
-      set(newValue) {
-        setState({
-          ...state,
-          ...args.createNewState(copy(state), newValue, contextHookArgs.args),
-        });
-      },
-      get() {
-        return args.getFromState(copy(state), contextHookArgs.args);
-      },
-    };
-  };
-}
-
 /**
  * The saved state of the extension for the current URL.
  */
@@ -150,6 +68,12 @@ export function useSavedState(
       setState(createDefaultSavedState());
     },
   };
+}
+
+function hookFactory<T, K extends keyof URLData, E extends object = object>(
+  args: Omit<HookFactoryArgs<T, URLData, Pick<URLData, K>, E>, "contextState">,
+) {
+  return baseHookFactory({ ...args, contextState: SavedStateContext });
 }
 
 /**
