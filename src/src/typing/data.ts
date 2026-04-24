@@ -18,7 +18,7 @@ export interface LoopableInfo {
    */
   selectors: string;
 }
-const loopableInfoSchema = z.object({
+export const loopableInfoSchema = z.object({
   loopableIndex: z.number(),
   selectors: z.string(),
 });
@@ -34,7 +34,7 @@ export interface TimeSection {
   disabled?: boolean;
   description?: string;
 }
-const timeSectionSchema = z.object({
+export const timeSectionSchema = z.object({
   startTime: z.number(),
   endTime: z.number(),
   disabled: z.boolean().optional(),
@@ -47,7 +47,7 @@ const timeSectionSchema = z.object({
 export interface LoopInfo extends LoopableInfo {
   timeSections: TimeSection[];
 }
-const loopInfoSchema = z.object({
+export const loopInfoSchema = z.object({
   ...loopableInfoSchema.shape,
   timeSections: z.array(timeSectionSchema),
 });
@@ -69,7 +69,7 @@ export interface URLMetaData {
    */
   tags?: string[];
 }
-const urlMetaDataSchema = z
+export const urlMetaDataSchema = z
   .object({
     title: z.string(),
     description: z.string(),

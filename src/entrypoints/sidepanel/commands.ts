@@ -7,6 +7,7 @@ import * as z from "zod";
 import {
   parseAndReturnResponse,
   Request,
+  requestSchema,
   Response,
   responseSchema,
 } from "@/src/typing/commands";
@@ -17,6 +18,8 @@ import {
   LoopInfo,
   urlDataSchema,
   domainDataSchema,
+  loopableInfoSchema,
+  loopInfoSchema,
 } from "@/src/typing/data";
 
 /**
@@ -92,10 +95,14 @@ async function sendToTab<K extends keyof CommandRegistry>(
   };
 }
 
+const videoTimeRequestSchema = requestSchema(
+  z.literal("video_time"),
+  loopableInfoSchema,
+);
 const videoTimeResponseSchema = responseSchema(z.object({ time: z.number() }));
 export interface CommandRegistry {
   video_time: RequestResponsePair<
-    Request<"video_time", LoopableInfo>,
+    z.infer<typeof videoTimeRequestSchema>,
     z.infer<typeof videoTimeResponseSchema>
   >;
 }
@@ -111,10 +118,14 @@ async function getVideoTime(data: LoopableInfo) {
   return parseAndReturnResponse(videoTimeResponseSchema, response);
 }
 
+const logMessageRequestSchema = requestSchema(
+  z.literal("log_message"),
+  z.object({ message: z.string() }),
+);
 const logMessageResponseSchema = responseSchema(z.null());
 export interface CommandRegistry {
   log_message: RequestResponsePair<
-    Request<"log_message", { message: string }>,
+    z.infer<typeof logMessageRequestSchema>,
     z.infer<typeof logMessageResponseSchema>
   >;
 }
@@ -131,10 +142,14 @@ async function logMessage(message: string) {
   return parseAndReturnResponse(logMessageResponseSchema, response);
 }
 
+const saveDataRequestSchema = requestSchema(
+  z.literal("save_data"),
+  urlDataSchema,
+);
 const saveDataResponseSchema = responseSchema(z.null());
 export interface CommandRegistry {
   save_data: RequestResponsePair<
-    Request<"save_data", URLData>,
+    z.infer<typeof saveDataRequestSchema>,
     z.infer<typeof saveDataResponseSchema>
   >;
 }
@@ -147,10 +162,11 @@ async function saveData(data: URLData) {
   return parseAndReturnResponse(saveDataResponseSchema, response);
 }
 
+const loadDataRequestSchema = requestSchema(z.literal("load_data"), z.null());
 const loadDataResponseSchema = responseSchema(urlDataSchema);
 export interface CommandRegistry {
   load_data: RequestResponsePair<
-    Request<"load_data", null>,
+    z.infer<typeof loadDataRequestSchema>,
     z.infer<typeof loadDataResponseSchema>
   >;
 }
@@ -165,10 +181,14 @@ async function loadData() {
   return parseAndReturnResponse(loadDataResponseSchema, response);
 }
 
+const loadDomainDataRequestSchema = requestSchema(
+  z.literal("load_domain_data"),
+  z.null(),
+);
 const loadDomainDataResponseSchema = responseSchema(domainDataSchema);
 export interface CommandRegistry {
   load_domain_data: RequestResponsePair<
-    Request<"load_domain_data", null>,
+    z.infer<typeof loadDomainDataRequestSchema>,
     z.infer<typeof loadDomainDataResponseSchema>
   >;
 }
@@ -182,10 +202,14 @@ async function loadDomainData() {
   return parseAndReturnResponse(loadDomainDataResponseSchema, response);
 }
 
+const deleteDomainDataRequestSchema = requestSchema(
+  z.literal("delete_domain_data"),
+  z.null(),
+);
 const deleteDomainDataResponseSchema = responseSchema(z.null());
 export interface CommandRegistry {
   delete_domain_data: RequestResponsePair<
-    Request<"delete_domain_data", null>,
+    z.infer<typeof deleteDomainDataRequestSchema>,
     z.infer<typeof deleteDomainDataResponseSchema>
   >;
 }
@@ -202,10 +226,14 @@ async function deleteDomainData() {
   return parseAndReturnResponse(deleteDomainDataResponseSchema, response);
 }
 
+const deleteDomainUrlDataRequestSchema = requestSchema(
+  z.literal("delete_domain_url_data"),
+  z.object({ urls: z.httpUrl().array() }),
+);
 const deleteDomainUrlDataResponseSchema = responseSchema(z.null());
 export interface CommandRegistry {
   delete_domain_url_data: RequestResponsePair<
-    Request<"delete_domain_url_data", { urls: string[] }>,
+    z.infer<typeof deleteDomainUrlDataRequestSchema>,
     z.infer<typeof deleteDomainUrlDataResponseSchema>
   >;
 }
@@ -221,14 +249,18 @@ async function deleteDomainUrlData(data: { urls: string[] }) {
   return parseAndReturnResponse(deleteDomainUrlDataResponseSchema, response);
 }
 
-const intervalIdSchema = z.object({
-  intervalId: z.number(),
-});
-
-const enableLoopingResponseSchema = responseSchema(intervalIdSchema);
+const enableLoopingRequestSchema = requestSchema(
+  z.literal("enable_looping"),
+  loopInfoSchema,
+);
+const enableLoopingResponseSchema = responseSchema(
+  z.object({
+    intervalId: z.number(),
+  }),
+);
 export interface CommandRegistry {
   enable_looping: RequestResponsePair<
-    Request<"enable_looping", LoopInfo>,
+    z.infer<typeof enableLoopingRequestSchema>,
     z.infer<typeof enableLoopingResponseSchema>
   >;
 }
@@ -244,10 +276,14 @@ async function enableLooping(loopInfo: LoopInfo) {
   return parseAndReturnResponse(enableLoopingResponseSchema, response);
 }
 
+const disableLoopingRequestSchema = requestSchema(
+  z.literal("disable_looping"),
+  z.null(),
+);
 const disableLoopingResponseSchema = responseSchema(z.null());
 export interface CommandRegistry {
   disable_looping: RequestResponsePair<
-    Request<"disable_looping", null>,
+    z.infer<typeof disableLoopingRequestSchema>,
     z.infer<typeof disableLoopingResponseSchema>
   >;
 }
@@ -269,13 +305,21 @@ export interface CommandRegistry {
   unknown: RequestResponsePair<Request<"unknown", null>, Response<null>>;
 }
 
-interface ChooseVideoArgs extends Pick<LoopableInfo, "selectors"> {}
+const chooseVideoArgsSchema = z.object({
+  ...loopableInfoSchema.pick({ selectors: true }).shape,
+});
+type ChooseVideoArgs = z.infer<typeof chooseVideoArgsSchema>;
+
+const elementListLengthRequestSchema = requestSchema(
+  z.literal("element_list_length"),
+  chooseVideoArgsSchema,
+);
 const elementListLengthResponseSchema = responseSchema(
   z.object({ length: z.number() }),
 );
 export interface CommandRegistry {
   element_list_length: RequestResponsePair<
-    Request<"element_list_length", ChooseVideoArgs>,
+    z.infer<typeof elementListLengthRequestSchema>,
     z.infer<typeof elementListLengthResponseSchema>
   >;
 }
@@ -292,15 +336,21 @@ async function elementListLength(data: ChooseVideoArgs) {
   return parseAndReturnResponse(elementListLengthResponseSchema, response);
 }
 
-interface HighlightComponentArgs extends Pick<LoopableInfo, "selectors"> {
-  indices: number[];
-}
+const highlightComponentArgsSchema = z.object({
+  ...loopableInfoSchema.pick({ selectors: true }).shape,
+  indices: z.number().array(),
+});
+type HighlightComponentArgs = z.infer<typeof highlightComponentArgsSchema>;
+const highlightElementsRequestSchema = requestSchema(
+  z.literal("highlight_elements"),
+  highlightComponentArgsSchema,
+);
 const highlightElementsResponseSchema = responseSchema(
   z.object({ invalidIndices: z.number().array() }),
 );
 export interface CommandRegistry {
   highlight_elements: RequestResponsePair<
-    Request<"highlight_elements", HighlightComponentArgs>,
+    z.infer<typeof highlightElementsRequestSchema>,
     z.infer<typeof highlightElementsResponseSchema>
   >;
 }
@@ -317,12 +367,16 @@ async function highlightElements(data: HighlightComponentArgs) {
   return parseAndReturnResponse(highlightElementsResponseSchema, response);
 }
 
+const downloadDataRequestSchema = requestSchema(
+  z.literal("download_data"),
+  z.null(),
+);
 const downloadDataResponseSchema = responseSchema(
   z.object({ filename: z.string() }),
 );
 export interface CommandRegistry {
   download_data: RequestResponsePair<
-    Request<"download_data", null>,
+    z.infer<typeof downloadDataRequestSchema>,
     z.infer<typeof downloadDataResponseSchema>
   >;
 }
@@ -338,10 +392,14 @@ async function downloadData() {
   return parseAndReturnResponse(downloadDataResponseSchema, response);
 }
 
+const loadDataFromFileRequestSchema = requestSchema(
+  z.literal("load_data_from_file"),
+  z.null(),
+);
 const loadDataFromFileResponseSchema = responseSchema(z.null());
 export interface CommandRegistry {
   load_data_from_file: RequestResponsePair<
-    Request<"load_data_from_file", null>,
+    z.infer<typeof loadDataFromFileRequestSchema>,
     z.infer<typeof loadDataFromFileResponseSchema>
   >;
 }
@@ -358,10 +416,14 @@ async function loadDataFromFile() {
   return parseAndReturnResponse(loadDataFromFileResponseSchema, response);
 }
 
+const upgradeDomainDataRequestSchema = requestSchema(
+  z.literal("upgrade_domain_data"),
+  z.null(),
+);
 const upgradeDomainDataResponseSchema = responseSchema(z.null());
 export interface CommandRegistry {
   upgrade_domain_data: RequestResponsePair<
-    Request<"upgrade_domain_data", null>,
+    z.infer<typeof upgradeDomainDataRequestSchema>,
     z.infer<typeof upgradeDomainDataResponseSchema>
   >;
 }
@@ -378,12 +440,16 @@ async function upgradeDomainData() {
   return parseAndReturnResponse(upgradeDomainDataResponseSchema, response);
 }
 
+const getLoopIdsRequestSchema = requestSchema(
+  z.literal("get_loop_ids"),
+  z.null(),
+);
 const getLoopIdsResponseSchema = responseSchema(
   z.object({ loopIds: z.number().array() }),
 );
 export interface CommandRegistry {
   get_loop_ids: RequestResponsePair<
-    Request<"get_loop_ids", null>,
+    z.infer<typeof getLoopIdsRequestSchema>,
     z.infer<typeof getLoopIdsResponseSchema>
   >;
 }
@@ -419,4 +485,25 @@ export const commands = {
   highlightElements,
   downloadData,
   loadDataFromFile,
+};
+
+/**
+ * Holds validation schemas for requests created by commands.
+ */
+export const requestSchemas = {
+  videoTime: videoTimeRequestSchema,
+  logMessage: logMessageRequestSchema,
+  saveData: saveDataRequestSchema,
+  loadData: loadDataRequestSchema,
+  loadDomainData: loadDomainDataRequestSchema,
+  deleteDomainData: deleteDomainDataRequestSchema,
+  deleteDomainUrlData: deleteDomainUrlDataRequestSchema,
+  upgradeDomainData: upgradeDomainDataRequestSchema,
+  enableLooping: enableLoopingRequestSchema,
+  disableLooping: disableLoopingRequestSchema,
+  getLoopIds: getLoopIdsRequestSchema,
+  elementListLength: elementListLengthRequestSchema,
+  highlightElements: highlightElementsRequestSchema,
+  downloadData: downloadDataRequestSchema,
+  loadDataFromFile: loadDataFromFileRequestSchema,
 };

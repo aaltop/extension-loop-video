@@ -11,6 +11,22 @@ export interface Request<Com, Data = object> {
 }
 
 /**
+ * Create the schema for a {@link Request} sent to a content script.
+ * @param commandSchema The schema for the type of the command sent with the
+ * request.
+ * @param dataSchema The schema for the type of data sent with the request.
+ */
+export function requestSchema<Com extends z.ZodType, Data extends z.ZodType>(
+  commandSchema: Com,
+  dataSchema: Data,
+) {
+  return z.object({
+    command: commandSchema,
+    data: dataSchema,
+  });
+}
+
+/**
  * A response sent from a content script.
  * @param Data The type of the data sent with the response.
  */
