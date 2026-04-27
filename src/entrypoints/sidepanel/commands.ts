@@ -58,6 +58,8 @@ export type CommandString =
  * Set of request-response pairs representing communication to and from
  * a content-script.
  */
+// this is filled later on in the file, create the doc-comment here though
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CommandRegistry {}
 
 /**

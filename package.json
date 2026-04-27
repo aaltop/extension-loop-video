@@ -20,10 +20,14 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@eslint/compat": "^2.0.5",
+    "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.2.2",
+    "eslint": "^10.2.1",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0",
     "wxt": "^0.20.25"
   }
 }

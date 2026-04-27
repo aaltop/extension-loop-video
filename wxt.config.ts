@@ -18,6 +18,12 @@ export default defineConfig({
     browser_specific_settings: {
       gecko: {
         id: "@loop_video.aaltop",
+        // @ts-expect-error: this isn't in the schema, apparently
+        // (though it IS part of manifest.json), but setting it does
+        // suppress a warning sent by WXT, so it does seem to be used.
+        data_collection_permissions: {
+          required: ["none"],
+        },
       },
     },
   },

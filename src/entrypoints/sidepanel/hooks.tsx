@@ -59,9 +59,8 @@ export function useTimeout<T extends string>({
       deactivationFunction();
       setState(() => null);
 
-      let customDelay: number;
       const ret = executable ? executable() : activationFunction();
-      customDelay = getValidDelay(ret.delay ?? delay);
+      const customDelay: number = getValidDelay(ret.delay ?? delay);
       setState(() => ret.stateValue);
       const id = window.setTimeout(() => {
         deactivationFunction();

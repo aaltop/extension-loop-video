@@ -53,7 +53,6 @@ export function parseAndReturnResponse<TSchema extends z.ZodType>(
   response: Response<unknown>,
 ) {
   const parsed = schema.safeParse(response);
-  parsed.success;
   if (parsed.success) {
     return parsed.data;
   } else {

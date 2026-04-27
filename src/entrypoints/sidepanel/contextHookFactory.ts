@@ -6,10 +6,14 @@
 import { ValueState } from "@/src/typing/state";
 import { Context, use } from "react";
 
-interface Permissions {
-  set?: boolean;
-}
+// interface Permissions {
+//   set?: boolean;
+// }
 
+// It's a placeholder, might be used, might be not, currently isn't
+// but should be added where it could be needed so that if it gets
+// updated, it doesn't need to be added everywhere.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ContextHookArgs {}
 
 /**

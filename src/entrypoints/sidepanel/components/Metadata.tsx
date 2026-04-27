@@ -209,10 +209,6 @@ function Tags() {
 }
 
 export default function MetaDataHandler() {
-  const title = useTitle();
-  const description = useDescription();
-  const tags = useTags();
-
   return (
     <div className="metadata-wrapper">
       <Title />

@@ -21,7 +21,6 @@ import Notification from "./components/Notification.tsx";
 import { NotificationContextProvider } from "./contexts/NotificationContext";
 import LoadButton from "./components/LoadButton";
 import DomainDataContext from "./contexts/DomainDataContext.tsx";
-import { usePreferConfirm } from "./contexts/AppSettingsContext.tsx";
 import MenuBar from "./components/MenuBar.tsx";
 
 /**
@@ -47,7 +46,7 @@ function Controls() {
     }
 
     async function receiveFromTab(
-      _message: any,
+      _message: object,
       sender: Browser.runtime.MessageSender,
     ) {
       if (sender.tab) {
@@ -132,10 +131,7 @@ function Controls() {
 }
 
 export default function App() {
-  const popupData = useSavedState();
   const { update: updateDomainData } = use(DomainDataContext);
-  const { logger } = use(ConsoleContext);
-  const preferConfirm = usePreferConfirm();
 
   const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
 
@@ -148,7 +144,7 @@ export default function App() {
 
   useEffect(() => {
     async function synchronize(
-      _message: any,
+      _message: object,
       sender: Browser.runtime.MessageSender,
     ) {
       if (sender.tab) {

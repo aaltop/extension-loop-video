@@ -2,6 +2,7 @@ import { useLoopableIndex, useSelectors } from "../contexts/SavedStateContext";
 import { ConsoleContext } from "../contexts/ConsoleContext";
 import { commands } from "../commands";
 import "./ElementHighlight.css";
+import { handleResponse } from "../helpers";
 
 /**
  * Component for highlighting elements based on a selector.
@@ -80,12 +81,7 @@ export default function ElementHighlight() {
             selectors: selectors.get(),
             indices,
           });
-          // if (response.success && response.data.invalidIndices.length > 0) {
-          //   const indicesString = JSON.stringify(response.data.invalidIndices);
-          //   logger.log(
-          //     JSON.stringify(`Invalid highlight indices: ${indicesString}`),
-          //   );
-          // }
+          handleResponse(response, logger);
         }}
       >
         {`Highlight video ${loopableIndex.get() + 1} out of ${elemNum ?? "none"}`}

@@ -3,7 +3,6 @@ import { URLData } from "@/src/typing/data";
 import { ValueState } from "@/src/typing/state";
 import {
   HookFactoryArgs,
-  ContextHook,
   ContextHookArgs,
   hookFactory as baseHookFactory,
 } from "../contextHookFactory";
@@ -56,6 +55,8 @@ export function SavedStateProvider({
  * The saved state of the extension for the current URL.
  */
 export function useSavedState(
+  // it's showing the intention, though not being used
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   args?: ContextHookArgs,
 ): ValueState<URLData> & { reset: () => void } {
   const { state, setState } = useContext(SavedStateContext);
@@ -187,10 +188,10 @@ export const useTimeSectionDisable = hookFactory<
 });
 
 const _useTimeSection = hookFactory<URLData["timeSections"], "timeSections">({
-  getFromState(state, hookArgs) {
+  getFromState(state) {
     return state.timeSections;
   },
-  createNewState(prevState, newValue, hookArgs) {
+  createNewState(prevState, newValue) {
     return { timeSections: newValue };
   },
 });
@@ -264,10 +265,10 @@ export function useTimeSectionControl(): {
 }
 
 const _useTitle = hookFactory<URLData["title"], "title">({
-  getFromState(state, hookArgs) {
+  getFromState(state) {
     return state.title;
   },
-  createNewState(prevState, newValue, hookArgs) {
+  createNewState(prevState, newValue) {
     return {
       ...prevState,
       title: newValue,
@@ -283,10 +284,10 @@ export function useTitle() {
 }
 
 const _useDescription = hookFactory<URLData["description"], "description">({
-  getFromState(state, hookArgs) {
+  getFromState(state) {
     return state.description;
   },
-  createNewState(prevState, newValue, hookArgs) {
+  createNewState(prevState, newValue) {
     return {
       ...prevState,
       description: newValue,
@@ -302,10 +303,10 @@ export function useDescription() {
 }
 
 const _useTags = hookFactory<Set<string>, "tags">({
-  getFromState(state, hookArgs) {
+  getFromState(state) {
     return new Set(state.tags);
   },
-  createNewState(prevState, newValue, hookArgs) {
+  createNewState(prevState, newValue) {
     return {
       ...prevState,
       tags: [...newValue],

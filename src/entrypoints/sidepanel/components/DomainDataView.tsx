@@ -45,7 +45,7 @@ export default function DomainDataView() {
                   <input
                     type="checkbox"
                     name={tag}
-                    onChange={(ev) => tagMap.toggle(tag)}
+                    onChange={() => tagMap.toggle(tag)}
                   />
                 </label>
               </li>
@@ -79,7 +79,7 @@ export default function DomainDataView() {
               <a href={url}>{`${val.title ?? "<No title>"} (${url})`}</a>
               <input
                 type="checkbox"
-                onChange={(ev) => {
+                onChange={() => {
                   urlDataMap.toggle(url);
                 }}
               />

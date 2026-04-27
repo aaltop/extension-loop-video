@@ -27,6 +27,8 @@
 !tsconfig.json
 !wxt.config.ts
 
+!eslint.config.js
+
 # FILES
 # ============
 

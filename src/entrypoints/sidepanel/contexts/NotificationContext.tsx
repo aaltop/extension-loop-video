@@ -22,7 +22,7 @@ export interface NotificationContextProps {
 }
 const NotificationContext = createContext<NotificationContextProps>({
   notification: createDefaultNotificationInfo(),
-  set(newValue) {
+  set() {
     throw new Error("Should not be called");
   },
   reset() {
