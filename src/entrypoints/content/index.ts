@@ -1,3 +1,5 @@
+import * as z from "zod";
+
 import {
   CommandRegistry,
   CommandUnion,
@@ -14,8 +16,15 @@ function sendResponse<K extends keyof CommandRegistry>(
 }
 
 function addMessageHandler() {
+  // message contains more than "command", so use loose to pass everything
+  // on, but for now only "command" is needed here
+  const messageParser = z.looseObject({ command: z.string() });
   browser.runtime.onMessage.addListener((_message, _, baseSendResponse) => {
-    const message = _message as CommandUnion["request"];
+    // pointing out that it's supposed to be CommandUnion["request"], but
+    // that only the command itself is required, and in practice that
+    // command does not even need to technically be one of the defined
+    // commands, only a string, as is evident below in the if-else.
+    const message = messageParser.parse(_message) as CommandUnion["request"];
     const com = message.command;
 
     if (responseHandlers[com]) {

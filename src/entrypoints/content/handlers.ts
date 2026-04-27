@@ -1,5 +1,15 @@
-import { DOMAIN_DATA_VERSION, DomainData, URLData } from "@/src/typing/data";
-import { CommandRegistry } from "@/entrypoints/sidepanel/commands";
+import * as z from "zod";
+
+import {
+  DOMAIN_DATA_VERSION,
+  DomainData,
+  domainDataSchema,
+  URLData,
+} from "@/src/typing/data";
+import {
+  CommandRegistry,
+  requestSchemas,
+} from "@/entrypoints/sidepanel/commands";
 import logger from "@/src/logger";
 import { playSections } from "./skipping";
 
@@ -88,13 +98,6 @@ namespace storage {
   }
 
   /**
-   * Whether the parsed stored data is valid.
-   */
-  export function storedDataIsValid(data: any) {
-    return data !== null && typeof data === "object";
-  }
-
-  /**
    * Get the stored data of the domain without performing any validation.
    */
   export function getStoredDataRaw(): any {
@@ -108,7 +111,9 @@ namespace storage {
    */
   export function getStoredData(): DomainData | undefined {
     const data = getStoredDataRaw();
-    return storedDataIsValid(data) ? data : undefined;
+    const parsed = domainDataSchema.safeParse(data);
+
+    return parsed.success ? parsed.data : undefined;
   }
 
   /**
@@ -123,7 +128,8 @@ namespace storage {
    * Set the stored data for this domain.
    */
   export function setStoredData(data: DomainData) {
-    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
+    const parsed = domainDataSchema.parse(data);
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(parsed));
   }
 
   /**
@@ -223,9 +229,12 @@ class LoopIdHandler extends DataElementHandler {
    * @returns The saved IDs.
    */
   getIds(): number[] {
-    return JSON.parse(
+    const ids = JSON.parse(
       this.getData({ dataAttributeSuffix: this.#idSuffix }) ?? "[]",
     );
+
+    const parser = z.number().array();
+    return parser.parse(ids);
   }
 
   #setIds({ ids }: { ids: number[] }) {
@@ -307,7 +316,8 @@ setHighlightStyle();
  * Set of functions that handle responding.
  */
 const _responseHandlers: ResponseRegistry = {
-  enable_looping: (message, baseSendResponse) => {
+  enable_looping: (_message, baseSendResponse) => {
+    const message = requestSchemas.enableLooping.parse(_message);
     const elements = document.querySelectorAll(message.data.selectors);
     if (elements.length <= message.data.loopableIndex) {
       sendResponse<"enable_looping">(baseSendResponse, {
@@ -354,7 +364,8 @@ const _responseHandlers: ResponseRegistry = {
     });
   },
 
-  highlight_elements: (message, baseSendResponse) => {
+  highlight_elements: (_message, baseSendResponse) => {
+    const message = requestSchemas.highlightElements.parse(_message);
     const invalidIndices: number[] = [];
     try {
       const elems = document.querySelectorAll(message.data.selectors);
@@ -394,7 +405,8 @@ const _responseHandlers: ResponseRegistry = {
     });
   },
 
-  element_list_length: (message, baseSendResponse) => {
+  element_list_length: (_message, baseSendResponse) => {
+    const message = requestSchemas.elementListLength.parse(_message);
     const len = document.querySelectorAll(message.data.selectors).length;
     sendResponse<"element_list_length">(baseSendResponse, {
       success: true,
@@ -442,7 +454,8 @@ const _responseHandlers: ResponseRegistry = {
     });
   },
 
-  delete_domain_url_data: (message, baseSendResponse) => {
+  delete_domain_url_data: (_message, baseSendResponse) => {
+    const message = requestSchemas.deleteDomainUrlData.parse(_message);
     storage.deleteStoredDataForUrls(message.data.urls);
     sendResponse<"delete_domain_url_data">(baseSendResponse, {
       success: true,
@@ -467,7 +480,8 @@ const _responseHandlers: ResponseRegistry = {
     }
   },
 
-  save_data: (message, baseSendResponse) => {
+  save_data: (_message, baseSendResponse) => {
+    const message = requestSchemas.saveData.parse(_message);
     logger.log("saving data...");
 
     const url = document.URL;
@@ -551,7 +565,8 @@ const _responseHandlers: ResponseRegistry = {
         const file = files[0];
 
         const data = JSON.parse(await file.text());
-        if (data !== null || typeof data === "object") {
+        const parsed = domainDataSchema.safeParse(data);
+        if (parsed.success) {
           storage.setStoredData(data);
           sendResponse<"load_data_from_file">(baseSendResponse, {
             success: true,
@@ -561,7 +576,7 @@ const _responseHandlers: ResponseRegistry = {
         } else {
           sendResponse<"load_data_from_file">(baseSendResponse, {
             success: false,
-            message: "Invalid data read from file: did not resemble an object",
+            message: `Invalid data read from file: ${z.prettifyError(parsed.error)}`,
           });
         }
       }
@@ -582,7 +597,8 @@ const _responseHandlers: ResponseRegistry = {
     });
   },
 
-  log_message: (message, baseSendResponse) => {
+  log_message: (_message, baseSendResponse) => {
+    const message = requestSchemas.logMessage.parse(_message);
     logger.log(`From sidebar: ${message.data.message}`);
     sendResponse<"log_message">(baseSendResponse, {
       success: true,
@@ -590,7 +606,8 @@ const _responseHandlers: ResponseRegistry = {
     });
   },
 
-  video_time: (message, baseSendResponse) => {
+  video_time: (_message, baseSendResponse) => {
+    const message = requestSchemas.videoTime.parse(_message);
     const elements = document.querySelectorAll(message.data.selectors);
     if (elements.length <= message.data.loopableIndex) {
       sendResponse<"video_time">(baseSendResponse, {
