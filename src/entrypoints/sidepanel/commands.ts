@@ -17,7 +17,7 @@ import {
   URLData,
   LoopInfo,
   urlDataSchema,
-  domainDataSchema,
+  domainDataV1Schema,
   loopableInfoSchema,
   loopInfoSchema,
 } from "@/src/typing/data";
@@ -185,7 +185,7 @@ const loadDomainDataRequestSchema = requestSchema(
   z.literal("load_domain_data"),
   z.null(),
 );
-const loadDomainDataResponseSchema = responseSchema(domainDataSchema);
+const loadDomainDataResponseSchema = responseSchema(domainDataV1Schema);
 export interface CommandRegistry {
   load_domain_data: RequestResponsePair<
     z.infer<typeof loadDomainDataRequestSchema>,

@@ -2,8 +2,8 @@ import * as z from "zod";
 
 import {
   DOMAIN_DATA_VERSION,
-  DomainData,
-  domainDataSchema,
+  DomainDataV1,
+  domainDataV1Schema,
   URLData,
 } from "@/src/typing/data";
 import {
@@ -70,7 +70,7 @@ namespace storage {
         /**
          * The upgraded data.
          */
-        data: DomainData;
+        data: DomainDataV1;
       }
     | {
         /**
@@ -93,7 +93,7 @@ namespace storage {
     if (!data["version"]) {
       data["version"] = "v1";
     }
-    const domainData = data as DomainData;
+    const domainData = data as DomainDataV1;
     return { success: true, data: domainData };
   }
 
@@ -109,9 +109,9 @@ namespace storage {
   /**
    * Get the stored data of the extension for this domain.
    */
-  export function getStoredData(): DomainData | undefined {
+  export function getStoredData(): DomainDataV1 | undefined {
     const data = getStoredDataRaw();
-    const parsed = domainDataSchema.safeParse(data);
+    const parsed = domainDataV1Schema.safeParse(data);
 
     return parsed.success ? parsed.data : undefined;
   }
@@ -127,8 +127,8 @@ namespace storage {
   /**
    * Set the stored data for this domain.
    */
-  export function setStoredData(data: DomainData) {
-    const parsed = domainDataSchema.parse(data);
+  export function setStoredData(data: DomainDataV1) {
+    const parsed = domainDataV1Schema.parse(data);
     window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(parsed));
   }
 
@@ -565,7 +565,7 @@ const _responseHandlers: ResponseRegistry = {
         const file = files[0];
 
         const data = JSON.parse(await file.text());
-        const parsed = domainDataSchema.safeParse(data);
+        const parsed = domainDataV1Schema.safeParse(data);
         if (parsed.success) {
           storage.setStoredData(data);
           sendResponse<"load_data_from_file">(baseSendResponse, {

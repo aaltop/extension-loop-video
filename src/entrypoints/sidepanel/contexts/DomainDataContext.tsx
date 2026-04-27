@@ -3,7 +3,7 @@ import { createContext } from "react";
 import { commands } from "../commands";
 import {
   DOMAIN_DATA_VERSION,
-  DomainData,
+  DomainDataV1,
   URLMetaData,
 } from "@/src/typing/data";
 
@@ -46,7 +46,7 @@ export function DomainDataContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [domainData, setDomainData] = useState<DomainData>({
+  const [domainData, setDomainData] = useState<DomainDataV1>({
     loopingData: {},
     version: DOMAIN_DATA_VERSION,
   });

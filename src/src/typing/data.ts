@@ -96,11 +96,11 @@ export const LOOPING_DATA_KEY = "loopingData" as const;
  * The version of the domain data.
  */
 export const DOMAIN_DATA_VERSION = "v1" as const;
-export interface DomainData {
+export interface DomainDataV1 {
   version: "v1";
   loopingData: Record<string, URLData>;
 }
-export const domainDataSchema = z.object({
+export const domainDataV1Schema = z.object({
   version: z.literal(DOMAIN_DATA_VERSION),
   loopingData: z.record(z.httpUrl(), urlDataSchema),
 });
