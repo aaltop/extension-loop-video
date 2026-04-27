@@ -15,15 +15,15 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@wxt-dev/module-react": "^1.1.5",
-    "typescript": "^5.9.3",
-    "wxt": "^0.20.18"
+    "@wxt-dev/module-react": "^1.2.2",
+    "typescript": "^6.0.3",
+    "wxt": "^0.20.25"
   }
 }
