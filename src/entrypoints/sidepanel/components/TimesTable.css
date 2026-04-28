@@ -1,4 +1,9 @@
-.times-table.wrapper {
+.times-table-wrapper {
+
+  .times-table-section-disable.enabled {
+    border-inline-start-color: hsl(from var(--brand-color) h calc(s - 20) l);
+    border-inline-start-width: 2px;
+  }
 
   div.times-table {
     display: flex;

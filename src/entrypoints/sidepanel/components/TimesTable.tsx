@@ -64,7 +64,9 @@ function TimesTableRow({ index }: { index: number }) {
 
   return (
     <tr>
-      <td>
+      <td
+        className={`times-table-section-disable ${disabled.get() ? "disabled" : "enabled"}`}
+      >
         <button type="button" onClick={() => disabled.set(!disabled.get())}>
           {disabled.get() ? "Enable" : "Disable"}
         </button>
@@ -85,7 +87,7 @@ export default function TimesTable() {
   ));
 
   return (
-    <div className="times-table wrapper">
+    <div className="times-table-wrapper">
       <ButtonRow>
         <button
           type="button"
