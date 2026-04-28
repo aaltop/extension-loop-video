@@ -4,7 +4,11 @@ import "@/entrypoints/sidepanel/mixins.css";
 
 import { commands } from "./commands";
 import { useSavedState } from "./contexts/SavedStateContext";
-import { ConsoleContext } from "./contexts/ConsoleContext";
+import {
+  ConsoleContext,
+  LoggingLevel,
+  LoggingLevelNumeric,
+} from "./contexts/ConsoleContext";
 import { syncMessageSchema } from "../content/typing";
 import { handleResponse as baseHandleResponse } from "./helpers";
 
@@ -130,6 +134,35 @@ function Controls() {
   );
 }
 
+function ConsoleControl() {
+  const [level, setLevel] = useState<LoggingLevelNumeric>(LoggingLevel.ERROR);
+
+  return (
+    <details>
+      <summary>
+        Console{" "}
+        <select>
+          {Object.entries(LoggingLevel).map(([key, val]) => {
+            return (
+              <option
+                value={val}
+                key={key}
+                selected={val === LoggingLevel.ERROR}
+                onClick={() => {
+                  setLevel(() => val);
+                }}
+              >
+                {key}
+              </option>
+            );
+          })}
+        </select>
+      </summary>
+      <Console minLevel={level} />
+    </details>
+  );
+}
+
 export default function App() {
   const { update: updateDomainData } = use(DomainDataContext);
 
@@ -181,11 +214,8 @@ export default function App() {
         <DomainDataView />
       </details>
 
+      <ConsoleControl />
       <hr />
-      <details>
-        <summary>Console</summary>
-        <Console />
-      </details>
     </div>
   );
 }

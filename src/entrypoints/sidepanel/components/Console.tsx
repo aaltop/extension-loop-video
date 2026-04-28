@@ -5,12 +5,32 @@ import "./Console.css";
 /**
  * Component for displaying messages sent to the console.
  */
-export default function Console() {
+export default function Console({
+  minLevel,
+}: {
+  /**
+   * The logging level; see LoggingLevel.
+   */
+  minLevel: number;
+}) {
   const { log } = useContext(ConsoleContext);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref || !ref.current) return;
+    ref.current.scroll({
+      left: 0,
+      top: ref.current.scrollHeight,
+      behavior: "instant",
+    });
+  }, [minLevel]);
 
   return (
-    <div className="console wrapper">
+    <div ref={ref} className="console wrapper">
       {log.map((msg, i) => {
+        if (msg.level < minLevel) {
+          return null;
+        }
         const message = toStringIndividual(msg);
         return (
           <p key={i} className={"console entry"}>

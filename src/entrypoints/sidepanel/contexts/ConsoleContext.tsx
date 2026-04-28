@@ -2,23 +2,39 @@
 
 import { createContext } from "react";
 
-export enum LoggingLevel {
-  DEBUG = 0,
-  INFO = 10,
-  WARNING = 20,
-  ERROR = 30,
-  CRITICAL = 40,
-}
+export const LoggingLevel = {
+  DEBUG: 0,
+  INFO: 10,
+  WARNING: 20,
+  ERROR: 30,
+  CRITICAL: 40,
+} as const;
+
+/**
+ * Inverse mapping of {@link LoggingLevel}.
+ */
+const LoggingLevelNumber = Object.fromEntries(
+  Object.entries(LoggingLevel).map(([key, val]) => [val, key]),
+);
+
+/**
+ * Union matcing the numeric levels of {@link LoggingLevel}.
+ */
+export type LoggingLevelNumeric =
+  (typeof LoggingLevel)[keyof typeof LoggingLevel];
+
+/**
+ * Union matcing the string representation of the levels of {@link LoggingLevel}.
+ */
+export type LoggingLevelString = keyof typeof LoggingLevel;
 
 /**
  * Get the word that represents the current log level.
  */
 export function getLogLevel(level: number): string {
-  level = Math.min(Math.max(0, level), 40);
+  level = Math.min(Math.max(LoggingLevel.DEBUG, level), LoggingLevel.CRITICAL);
   const idx = Math.floor(level / 10) * 10;
-  // technically keyof typeof LoggingLevel, but can't be bothered to actually
-  // sort it out
-  return LoggingLevel[idx];
+  return LoggingLevelNumber[idx.toString()];
 }
 
 /**
@@ -106,7 +122,7 @@ export function ConsoleContextProvider({
 }) {
   const [log, setLog] = useState<Log>([]);
 
-  function loggerWithLevel(level: LoggingLevel) {
+  function loggerWithLevel(level: LoggingLevelNumeric) {
     function log(...data: any[]) {
       setLog((prev) => [...prev, createConsoleEntry(level, ...data)]);
     }
