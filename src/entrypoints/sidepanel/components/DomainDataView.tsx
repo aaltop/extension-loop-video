@@ -19,21 +19,24 @@ export default function DomainDataView() {
 
   return (
     <div>
-      <input
-        type="text"
-        value={textFilter}
-        onChange={(ev) => {
-          setTextFilter(() => ev.target.value.toLowerCase());
-        }}
-      ></input>
-      <button
-        type="button"
-        onClick={async () => {
-          await domainData.update();
-        }}
-      >
-        Update
-      </button>
+      <label>
+        Filter
+        <input
+          type="text"
+          value={textFilter}
+          onChange={(ev) => {
+            setTextFilter(() => ev.target.value.toLowerCase());
+          }}
+        ></input>
+        <button
+          type="button"
+          onClick={async () => {
+            await domainData.update();
+          }}
+        >
+          Update
+        </button>
+      </label>
       <details>
         <summary>Tags</summary>
         <ul style={{ display: "flex" }}>

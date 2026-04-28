@@ -23,5 +23,11 @@
     margin-inline-end: 1px;
   }
 
+  label {
+    input {
+      max-inline-size: 100%;
+    }
+  }
+
   
 }

@@ -40,6 +40,7 @@ body {
       user-select: inherit;
       background-color: inherit;
       color: inherit;
+      box-sizing: border-box;
       
   }
 
