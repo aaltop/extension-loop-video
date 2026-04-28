@@ -1,0 +1,10 @@
+.domain-data-view-wrapper {
+  .domain-data-view-list {
+    --size: 15rem;
+    block-size: var(--size);
+    min-block-size: var(--size);
+    max-block-size: var(--size);
+    padding-block: 0.5rem;
+    overflow-y: scroll;
+  }
+}

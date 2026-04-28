@@ -6,6 +6,8 @@ import { handleResponse } from "../helpers";
 import { useCheckedMap } from "../hooks";
 import ButtonRow from "./ButtonRow";
 
+import "./DomainDataView.css";
+
 export default function DomainDataView() {
   const [textFilter, setTextFilter] = useState<string>("");
   const tagMap = useCheckedMap<string>({ defaultValue: null });
@@ -18,7 +20,7 @@ export default function DomainDataView() {
   }, []);
 
   return (
-    <div>
+    <div className={`domain-data-view-wrapper`}>
       <label>
         Filter
         <input
@@ -56,7 +58,7 @@ export default function DomainDataView() {
           })}
         </ul>
       </details>
-      <ul>
+      <ul className={`domain-data-view-list`}>
         {domainData.metadata.map(({ url, ...val }) => {
           /**
            * Whether this entry has each of the chosen tags.
