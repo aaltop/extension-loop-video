@@ -9,7 +9,6 @@ import {
   LoggingLevel,
   LoggingLevelNumeric,
 } from "./contexts/ConsoleContext";
-import { syncMessageSchema } from "../content/typing";
 import { handleResponse as baseHandleResponse } from "./helpers";
 
 import TimesTable from "./components/TimesTable";
@@ -26,6 +25,7 @@ import { NotificationContextProvider } from "./contexts/NotificationContext";
 import LoadButton from "./components/LoadButton";
 import DomainDataContext from "./contexts/DomainDataContext.tsx";
 import MenuBar from "./components/MenuBar.tsx";
+import synchronize from "./synchronize.ts";
 
 /**
  * Component containing general controls.
@@ -40,33 +40,19 @@ function Controls() {
     baseHandleResponse(response, logger);
   }
 
+  useEffect(synchronize(init), []);
+
   useEffect(() => {
-    async function init() {
-      const response = await commands.getLoopIds();
-      handleResponse(response);
-      if (response.success) {
-        setIntervalIds(() => response.data.loopIds);
-      }
-    }
-
-    async function receiveFromTab(
-      _message: object,
-      sender: Browser.runtime.MessageSender,
-    ) {
-      if (sender.tab) {
-        const message = syncMessageSchema.safeParse(_message);
-        if (message.success) {
-          init();
-        }
-      }
-    }
-
     init();
-    browser.runtime.onMessage.addListener(receiveFromTab);
-    return () => {
-      browser.runtime.onMessage.removeListener(receiveFromTab);
-    };
   }, []);
+
+  async function init() {
+    const response = await commands.getLoopIds();
+    handleResponse(response);
+    if (response.success) {
+      setIntervalIds(() => response.data.loopIds);
+    }
+  }
 
   return (
     <NotificationContextProvider>
@@ -102,9 +88,7 @@ function Controls() {
           {intervalIds.length > 0 ? "Disable looping" : "Enable looping"}
         </button>
 
-        <ButtonRow>
-          <ElementHighlight />
-        </ButtonRow>
+        <ElementHighlight />
 
         <ButtonRow>
           <button
@@ -175,24 +159,7 @@ export default function App() {
     execute();
   }, []);
 
-  useEffect(() => {
-    async function synchronize(
-      _message: object,
-      sender: Browser.runtime.MessageSender,
-    ) {
-      if (sender.tab) {
-        const message = syncMessageSchema.safeParse(_message);
-        if (message.success) {
-          updateDomainData();
-        }
-      }
-    }
-
-    browser.runtime.onMessage.addListener(synchronize);
-    return () => {
-      browser.runtime.onMessage.removeListener(synchronize);
-    };
-  }, []);
+  useEffect(synchronize(updateDomainData), []);
 
   return (
     <div key={tabChangeCounter} className="app wrapper input-with-button">

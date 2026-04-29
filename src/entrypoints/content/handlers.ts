@@ -250,6 +250,8 @@ const _responseHandlers: ResponseRegistry = {
     });
   },
 
+  // TODO: doesn't really make sense with the multiple indices and
+  // the scrollIntoView. Ideally figure out a better highlight method.
   highlight_elements: (_message, baseSendResponse) => {
     const message = requestSchemas.highlightElements.parse(_message);
     const invalidIndices: number[] = [];
@@ -297,6 +299,20 @@ const _responseHandlers: ResponseRegistry = {
     sendResponse<"element_list_length">(baseSendResponse, {
       success: true,
       data: { length: len },
+    });
+  },
+
+  get_media_element_list: (_message, baseSendResponse) => {
+    const message = requestSchemas.getMediaElementList.parse(_message);
+    const elems: HTMLMediaElement[] = Array.from(
+      document.querySelectorAll(message.data.selectors),
+    );
+
+    sendResponse<"get_media_element_list">(baseSendResponse, {
+      success: true,
+      data: elems.map((elem) => {
+        return { paused: elem.paused };
+      }),
     });
   },
 

@@ -50,6 +50,7 @@ export type CommandString =
   | "enable_looping"
   | "disable_looping"
   | "element_list_length"
+  | "get_media_element_list"
   | "highlight_elements"
   | "get_loop_ids"
   | "unknown";
@@ -338,6 +339,38 @@ async function elementListLength(data: ChooseVideoArgs) {
   return parseAndReturnResponse(elementListLengthResponseSchema, response);
 }
 
+const getMediaElementListArgsSchema = z.object({
+  selectors: z.literal("video"),
+});
+export const getMediaElementListRequestSchema = requestSchema(
+  z.literal("get_media_element_list"),
+  // limit to videos for now
+  getMediaElementListArgsSchema,
+);
+
+const getMediaElementListResponseSchema = responseSchema(
+  z.array(z.object({ paused: z.boolean() })),
+);
+
+export interface CommandRegistry {
+  get_media_element_list: RequestResponsePair<
+    z.infer<typeof getMediaElementListRequestSchema>,
+    z.infer<typeof getMediaElementListResponseSchema>
+  >;
+}
+
+/**
+ * Get HTML media element information for the current page.
+ */
+async function getMediaElementList() {
+  const response = await sendToTab<"get_media_element_list">({
+    command: "get_media_element_list",
+    data: { selectors: "video" },
+  });
+
+  return parseAndReturnResponse(getMediaElementListResponseSchema, response);
+}
+
 const highlightComponentArgsSchema = z.object({
   ...loopableInfoSchema.pick({ selectors: true }).shape,
   indices: z.number().array(),
@@ -484,6 +517,7 @@ export const commands = {
   disableLooping,
   getLoopIds,
   elementListLength,
+  getMediaElementList,
   highlightElements,
   downloadData,
   loadDataFromFile,
@@ -505,6 +539,7 @@ export const requestSchemas = {
   disableLooping: disableLoopingRequestSchema,
   getLoopIds: getLoopIdsRequestSchema,
   elementListLength: elementListLengthRequestSchema,
+  getMediaElementList: getMediaElementListRequestSchema,
   highlightElements: highlightElementsRequestSchema,
   downloadData: downloadDataRequestSchema,
   loadDataFromFile: loadDataFromFileRequestSchema,

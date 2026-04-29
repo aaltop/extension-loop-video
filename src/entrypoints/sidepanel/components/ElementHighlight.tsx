@@ -1,43 +1,45 @@
-import { useLoopableIndex, useSelectors } from "../contexts/SavedStateContext";
+import { useLoopableIndex } from "../contexts/SavedStateContext";
 import { ConsoleContext } from "../contexts/ConsoleContext";
 import { commands } from "../commands";
 import "./ElementHighlight.css";
 import { handleResponse } from "../helpers";
+import synchronize from "../synchronize";
+import ButtonRow from "./ButtonRow";
 
 /**
  * Component for highlighting elements based on a selector.
  */
 export default function ElementHighlight() {
   const loopableIndex = useLoopableIndex();
-  const selectors = useSelectors();
   const { logger } = useContext(ConsoleContext);
-  const [elemNum, setElemNum] = useState<number>(0);
+  // const [elemNum, setElemNum] = useState<number>(0);
+  const [elements, setElements] = useState<{ paused: boolean }[]>([]);
 
   useEffect(() => {
-    async function execute() {
-      await queryAndSetElemNum();
-    }
-    execute();
+    sync();
   }, []);
 
-  async function getElementListLength(selectors: string) {
-    const response = await commands.elementListLength({
-      selectors,
-    });
-    if (response.success) {
-      return response.data.length;
-    }
+  useEffect(synchronize(sync), []);
+
+  // doesn't set the loopableIndex because it's better if that updates
+  // as a result of user interaction only. That way, the tab can be changed
+  // and the state will update, but the choice of index does not. As a result,
+  // the user potentially sees a discrepancy but they also don't lose the
+  // index they chose in the other tab until they actually interact in this tab.
+  async function sync() {
+    await queryAndSetElementList();
   }
 
   /**
-   * Queries and sets the number of elements matching the current
-   * selectors value.
-   * @returns the new elemNum value.
+   * Queries and sets the information about the elements.
+   * @returns the queried-for information.
    */
-  async function queryAndSetElemNum() {
-    const len = (await getElementListLength(selectors.get())) ?? 0;
-    setElemNum(() => len);
-    return len;
+  async function queryAndSetElementList() {
+    const response = await commands.getMediaElementList();
+    handleResponse(response, logger);
+    if (!response.success) return null;
+    setElements(() => response.data);
+    return response.data;
   }
 
   /**
@@ -46,8 +48,9 @@ export default function ElementHighlight() {
    * @returns the new index.
    */
   async function addToIndex(val: number) {
-    const newElemNum = await queryAndSetElemNum();
-    if (newElemNum === 0 || newElemNum === null) {
+    const elemList = await queryAndSetElementList();
+    const newElemNum = elemList?.length ?? 0;
+    if (newElemNum === 0) {
       loopableIndex.set(-1);
       return -1;
     }
@@ -60,39 +63,62 @@ export default function ElementHighlight() {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        className="element-highlight nav"
-        onClick={async () => await addToIndex(-1)}
-      >
-        Previous
-      </button>
-      <button
-        type="button"
-        className="element-highlight highlight"
-        onClick={async () => {
-          // this addToIndex call is here mostly to keep the values
-          // up to date if something changes on the page.
-          const newLoopableIndex = await addToIndex(0);
-          if (newLoopableIndex < 0) return;
-          const indices = [newLoopableIndex];
-          const response = await commands.highlightElements({
-            selectors: selectors.get(),
-            indices,
-          });
-          handleResponse(response, logger);
-        }}
-      >
-        {`Highlight video ${loopableIndex.get() + 1} out of ${elemNum ?? "none"}`}
-      </button>
-      <button
-        type="button"
-        className="element-highlight nav"
-        onClick={async () => await addToIndex(1)}
-      >
-        Next
-      </button>
-    </>
+    <div className="element-highlight-wrapper">
+      <ButtonRow>
+        <select
+          onMouseEnter={() => queryAndSetElementList()}
+          onFocus={() => queryAndSetElementList()}
+        >
+          {elements.map((elem, idx) => {
+            const state = elem.paused ? "paused" : "playing";
+            return (
+              <option
+                className={`element-highlight-video-option ${state}`}
+                selected={loopableIndex.get() === idx}
+                onClick={() => {
+                  loopableIndex.set(idx);
+                }}
+                // sketchy, but no other particular identifiers
+                key={idx}
+              >{`Video ${idx + 1} (${state})`}</option>
+            );
+          })}
+        </select>
+        <button
+          type="button"
+          className="element-highlight-nav"
+          onClick={async () => {
+            await addToIndex(-1);
+          }}
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          className="element-highlight-highlight"
+          onClick={async () => {
+            // this addToIndex call is here mostly to keep the values
+            // up to date if something changes on the page.
+            const newLoopableIndex = await addToIndex(0);
+            if (newLoopableIndex < 0) return;
+            const indices = [newLoopableIndex];
+            const response = await commands.highlightElements({
+              selectors: "video",
+              indices,
+            });
+            handleResponse(response, logger);
+          }}
+        >
+          {`Highlight video ${loopableIndex.get() + 1} out of ${elements.length ?? "none"}`}
+        </button>
+        <button
+          type="button"
+          className="element-highlight-nav"
+          onClick={async () => await addToIndex(1)}
+        >
+          Next
+        </button>
+      </ButtonRow>
+    </div>
   );
 }
