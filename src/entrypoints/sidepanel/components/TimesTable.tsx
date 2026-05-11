@@ -13,6 +13,10 @@ import { commands } from "../commands";
 import ButtonRow from "./ButtonRow";
 
 import "./TimesTable.css";
+import { use } from "react";
+import ConsoleContext from "../contexts/ConsoleContext";
+import { handleResponse } from "../helpers";
+import { LoopingContext } from "../contexts/LoopingContext";
 
 function TimeInput({
   time,
@@ -23,6 +27,7 @@ function TimeInput({
 }) {
   const loopableIndex = useLoopableIndex();
   const selectors = useSelectors();
+  const { logger } = use(ConsoleContext);
 
   return (
     <td>
@@ -35,10 +40,9 @@ function TimeInput({
               loopableIndex: loopableIndex.get(),
               selectors: selectors.get(),
             });
+            handleResponse(response, logger);
             if (response.success) {
               setTime(response.data.time);
-            } else {
-              await commands.logMessage(response.message);
             }
           }}
         >
@@ -61,18 +65,37 @@ function TimeInput({
 function TimesTableRow({ index }: { index: number }) {
   const { startTime, endTime } = useLoopEnds({ index });
   const disabled = useTimeSectionDisable({ args: { index } });
+  const looping = use(LoopingContext);
+
+  function setTimeFactory(
+    setter: (val: number) => void,
+  ): (val: number) => void {
+    return (val: number) => {
+      setter(val);
+      looping.restart();
+    };
+  }
 
   return (
     <tr>
       <td
         className={`times-table-section-disable ${disabled.get() ? "disabled" : "enabled"}`}
       >
-        <button type="button" onClick={() => disabled.set(!disabled.get())}>
+        <button
+          type="button"
+          onClick={() => {
+            disabled.set(!disabled.get());
+            looping.restart();
+          }}
+        >
           {disabled.get() ? "Enable" : "Disable"}
         </button>
       </td>
-      <TimeInput time={startTime.get()} setTime={startTime.set} />
-      <TimeInput time={endTime.get()} setTime={endTime.set} />
+      <TimeInput
+        time={startTime.get()}
+        setTime={setTimeFactory(startTime.set)}
+      />
+      <TimeInput time={endTime.get()} setTime={setTimeFactory(endTime.set)} />
     </tr>
   );
 }

@@ -35,7 +35,31 @@ export function LoopingContextProvider({
   const savedState = useSavedState();
   const { logger } = use(ConsoleContext);
 
+  // bit of a hack for allowing synchronisation after savedState is
+  // updated. When this updates (see restart()), the effect runs and
+  // the looping can be started with new values. More robust ways,
+  // but this was a fast one.
+  const [update, setUpdate] = useState<number>(0);
   const [enabled, setEnabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function execute() {
+      if (enabled) {
+        logger.debug("Restarting looping");
+        const disableResponse = await commands.disableLooping();
+        if (!disableResponse.success) {
+          logger.error("Error restarting looping:", disableResponse.message);
+          return;
+        }
+        const response = await commands.enableLooping(savedState.get());
+        if (!response.success) {
+          logger.error("Error restarting looping:", response.message);
+          return;
+        }
+      }
+    }
+    execute();
+  }, [update]);
 
   async function enable() {
     logger.debug("Enabling looping");
@@ -56,19 +80,7 @@ export function LoopingContextProvider({
   }
 
   async function restart() {
-    if (enabled) {
-      logger.debug("Restarting looping");
-      const disableResponse = await commands.disableLooping();
-      if (!disableResponse.success) {
-        logger.error("Error restarting looping:", disableResponse.message);
-        return;
-      }
-      const response = await commands.enableLooping(savedState.get());
-      if (!response.success) {
-        logger.error("Error restarting looping:", response.message);
-        return;
-      }
-    }
+    setUpdate((prev) => (prev + 1) % 2);
   }
 
   return (
