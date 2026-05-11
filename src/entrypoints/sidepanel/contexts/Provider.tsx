@@ -8,11 +8,14 @@ import { ConsoleContextProvider } from "./ConsoleContext";
 import { JSX } from "react";
 import { DomainDataContextProvider } from "./DomainDataContext";
 import { AppSettingsContextProvider } from "./AppSettingsContext";
+import { LoopingContextProvider } from "./LoopingContext";
 
+// lower values are applied later, so wrap all previous ones
 const providers = [
-  SavedStateProvider,
+  LoopingContextProvider,
   DomainDataContextProvider,
   AppSettingsContextProvider,
+  SavedStateProvider,
   ConsoleContextProvider,
 ];
 

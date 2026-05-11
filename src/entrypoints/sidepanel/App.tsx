@@ -3,7 +3,6 @@ import "./App.css";
 import "@/entrypoints/sidepanel/mixins.css";
 
 import { commands } from "./commands";
-import { useSavedState } from "./contexts/SavedStateContext";
 import {
   ConsoleContext,
   LoggingLevel,
@@ -26,32 +25,18 @@ import LoadButton from "./components/LoadButton";
 import DomainDataContext from "./contexts/DomainDataContext.tsx";
 import MenuBar from "./components/MenuBar.tsx";
 import synchronize from "./synchronize.ts";
+import { LoopingContext } from "./contexts/LoopingContext.tsx";
 
 /**
  * Component containing general controls.
  */
 function Controls() {
-  const [intervalIds, setIntervalIds] = useState<number[]>([]);
+  const looping = use(LoopingContext);
 
   const { logger } = use(ConsoleContext);
-  const popupData = useSavedState();
 
   function handleResponse(response: Response<unknown>) {
     baseHandleResponse(response, logger);
-  }
-
-  useEffect(synchronize(init), []);
-
-  useEffect(() => {
-    init();
-  }, []);
-
-  async function init() {
-    const response = await commands.getLoopIds();
-    handleResponse(response);
-    if (response.success) {
-      setIntervalIds(() => response.data.loopIds);
-    }
   }
 
   return (
@@ -65,27 +50,17 @@ function Controls() {
 
         <button
           className="app loop-toggle"
-          data-enabled={intervalIds.length > 0}
+          data-enabled={looping.enabled}
           type="button"
           onClick={async () => {
-            if (intervalIds.length > 0) {
-              logger.debug("Disabling looping");
-              const response = await commands.disableLooping();
-              handleResponse(response);
-              setIntervalIds(() => []);
+            if (looping.enabled) {
+              looping.disable();
             } else {
-              logger.debug("Enabling looping");
-              const response = await commands.enableLooping(popupData.get());
-              handleResponse(response);
-              if (response.success) {
-                setIntervalIds((prev) => {
-                  return [...prev, response.data.intervalId];
-                });
-              }
+              looping.enable();
             }
           }}
         >
-          {intervalIds.length > 0 ? "Disable looping" : "Enable looping"}
+          {looping.enabled ? "Disable looping" : "Enable looping"}
         </button>
 
         <ElementHighlight />
