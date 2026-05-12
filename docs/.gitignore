@@ -1,16 +1,11 @@
 /*
 .*
 
-
 # INCLUDE BACK
 # ------------
 
 # DIRECTORIES
 # ------------
-
-!src
-!assets
-!docs
 
 # DIRECTORIES
 # ============
@@ -20,15 +15,7 @@
 
 !.gitignore
 
-!public
-
-!package.json
-!pnpm-lock.yaml
-!README.md
-!tsconfig.json
-!wxt.config.ts
-
-!eslint.config.js
+!manual.md
 
 # FILES
 # ============

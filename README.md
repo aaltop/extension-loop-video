@@ -4,7 +4,7 @@
 and looping through these sections. Created loops can be saved.
 Intended to work on any HTML videos, i.e. across all sites.
 
-# Description
+## Description
 
 If you've ever used the looping ability on Youtube but felt like it's a little
 too simple in some cases, this extension was designed with that in mind.
@@ -29,3 +29,8 @@ or sharing loops etc.
 and tags, and the list of created loops can be filtered based on these
 details. The list has links associated with each loop, allowing for
 quick access to the page the loop was created for.
+
+## Important
+
+Data currently saved in localStorage, could be wiped or run out of space.
+Backup if worried about losing! See [the technical details](./docs/technical_details.md).
