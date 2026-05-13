@@ -16,6 +16,7 @@
 !.gitignore
 
 !manual.md
+!technical_details.md
 
 # FILES
 # ============

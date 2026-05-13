@@ -32,5 +32,6 @@ quick access to the page the loop was created for.
 
 ## Important
 
-Data currently saved in localStorage, could be wiped or run out of space.
-Backup if worried about losing! See [the technical details](./docs/technical_details.md).
+Data is currently saved in localStorage, which could be wiped or run out of space.
+Backup your data if you're worried about losing it! See [the technical details](./docs/technical_details.md)
+for more information.
