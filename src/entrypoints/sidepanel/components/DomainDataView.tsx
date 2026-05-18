@@ -65,18 +65,14 @@ export default function DomainDataView() {
       </details>
       <ul className={`domain-data-view-list`}>
         {domainData.metadata.map(({ url, ...val }) => {
-          /**
-           * Whether this entry has each of the chosen tags.
-           */
+          // Whether this entry has each of the chosen tags.
           const correctTags =
             tagMap.size === 0 ||
             !!val.tags?.reduce((prev, cur) => {
               return prev || tagMap.has(cur);
             }, false);
 
-          /**
-           * Whether this entry matches the text filter.
-           */
+          // Whether this entry matches the text filter.
           const matchesTextFilter =
             textFilter === "" ||
             !!val.title?.toLowerCase().includes(textFilter) ||
@@ -89,6 +85,7 @@ export default function DomainDataView() {
               <a href={url}>{`${val.title ?? "<No title>"} (${url})`}</a>
               <input
                 type="checkbox"
+                checked={urlDataMap.has(url)}
                 onChange={() => {
                   urlDataMap.toggle(url);
                 }}
@@ -133,7 +130,7 @@ export default function DomainDataView() {
             }
           }}
         >
-          Delete chosen
+          Delete checked
         </button>
       </ButtonRow>
     </div>

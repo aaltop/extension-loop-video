@@ -175,7 +175,18 @@ function Tags() {
         <button
           type="button"
           className={`metadata ${tags.get().size > 0 ? "" : "global-hidden"}`}
-          onClick={() => setModify((prev) => !prev)}
+          onClick={() =>
+            setModify((prev) => {
+              if (prev) {
+                // If the selected tags aren't actually deleted by pressing
+                // the deletion button before modify is turned off, clear
+                // (and in particular, DON'T delete) the list of tags selected
+                // for deletion
+                setDeleteTags(() => []);
+              }
+              return !prev;
+            })
+          }
         >
           {modify ? "lock" : "modify"}
         </button>
