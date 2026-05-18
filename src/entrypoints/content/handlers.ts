@@ -476,24 +476,27 @@ const _responseHandlers: ResponseRegistry = {
       if (files !== null) {
         const file = files[0];
 
-        const data = JSON.parse(await file.text());
+        let data;
+        try {
+          data = JSON.parse(await file.text());
+        } catch (error) {
+          if (Error.isError(error)) {
+            logger.log(`Error while parsing JSON: ${error.message}`);
+            return;
+          }
+        } finally {
+          closeAndRemoveDialog();
+        }
         const parsed = domainDataV1Schema.safeParse(data);
         if (parsed.success) {
           storage.setStoredData(data);
-          sendResponse<"load_data_from_file">(baseSendResponse, {
-            success: true,
-            data: null,
-          });
           logger.log("Loaded data from file");
         } else {
-          sendResponse<"load_data_from_file">(baseSendResponse, {
-            success: false,
-            message: `Invalid data read from file: ${z.prettifyError(parsed.error)}`,
-          });
+          logger.log(
+            `Invalid data read from file: ${z.prettifyError(parsed.error)}`,
+          );
         }
       }
-
-      closeAndRemoveDialog();
     });
 
     fileInput.addEventListener("cancel", () => {
