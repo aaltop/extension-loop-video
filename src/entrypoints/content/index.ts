@@ -6,7 +6,7 @@ import {
 } from "@/entrypoints/sidepanel/commands";
 import responseHandlers from "./handlers";
 import logger from "@/src/logger";
-import { SyncMessage } from "./typing";
+import * as messages from "./messages";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -46,14 +46,10 @@ export default defineContentScript({
     addMessageHandler();
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
-        const message: SyncMessage = {
-          event: "visibilitychange",
-        };
-        browser.runtime.sendMessage(message);
+        messages.sync("visibilitychange");
       }
     });
 
-    const message: SyncMessage = { event: "loaded" };
-    browser.runtime.sendMessage(message);
+    messages.sync("loaded");
   },
 });

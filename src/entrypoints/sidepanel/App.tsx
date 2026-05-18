@@ -24,7 +24,7 @@ import { NotificationContextProvider } from "./contexts/NotificationContext";
 import LoadButton from "./components/LoadButton";
 import DomainDataContext from "./contexts/DomainDataContext.tsx";
 import MenuBar from "./components/MenuBar.tsx";
-import synchronize from "./synchronize.ts";
+import { receiveLog, synchronize } from "./messages.ts";
 import { LoopingContext } from "./contexts/LoopingContext.tsx";
 
 /**
@@ -124,17 +124,43 @@ function ConsoleControl() {
 
 export default function App() {
   const { update: updateDomainData } = use(DomainDataContext);
+  const { logger } = use(ConsoleContext);
 
   const [tabChangeCounter, setTabChangeCounter] = useState<number>(0);
 
-  useEffect(() => {
-    async function execute() {
-      await commands.logMessage("Hello from Loop Video!");
-    }
-    execute();
-  }, []);
-
   useEffect(synchronize(updateDomainData), []);
+  useEffect(
+    receiveLog((message) => {
+      switch (message.level) {
+        case "DEBUG":
+          logger.debug(message.data);
+          break;
+
+        case "INFO":
+          logger.info(message.data);
+          break;
+
+        case "WARNING":
+          logger.warning(message.data);
+          break;
+
+        case "ERROR":
+          logger.error(message.data);
+          break;
+
+        case "CRITICAL":
+          logger.critical(message.data);
+          break;
+
+        default:
+          logger.critical(
+            "Invalid log received from content script: ",
+            message.data,
+          );
+          break;
+      }
+    }),
+  );
 
   return (
     <div key={tabChangeCounter} className="app wrapper input-with-button">

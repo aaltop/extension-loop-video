@@ -3,7 +3,7 @@ import { ConsoleContext } from "../contexts/ConsoleContext";
 import { commands } from "../commands";
 import "./ElementHighlight.css";
 import { handleResponse } from "../helpers";
-import synchronize from "../synchronize";
+import { synchronize } from "../messages";
 import ButtonRow from "./ButtonRow";
 
 /**

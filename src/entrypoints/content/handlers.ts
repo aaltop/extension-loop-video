@@ -8,6 +8,7 @@ import {
 import logger from "@/src/logger";
 import { playSections } from "./skipping";
 import * as storage from "./localStorage.ts";
+import * as messages from "./messages.ts";
 
 function sendResponse<K extends keyof CommandRegistry>(
   baseSendResponse: (response: CommandRegistry[K]["response"]) => void,
@@ -481,7 +482,10 @@ const _responseHandlers: ResponseRegistry = {
           data = JSON.parse(await file.text());
         } catch (error) {
           if (Error.isError(error)) {
-            logger.log(`Error while parsing JSON: ${error.message}`);
+            messages.log({
+              level: "ERROR",
+              data: `Error while loading data from file: ${error.message}`,
+            });
             return;
           }
         } finally {
