@@ -163,7 +163,7 @@ function Tags() {
           }
         }}
       >
-        Save New Tag
+        Add Tag
       </button>
     </label>
   );
