@@ -30,6 +30,9 @@
 
 !eslint.config.js
 
+!apply_template.py
+!zensical.toml
+
 # FILES
 # ============
 
