@@ -61,6 +61,25 @@ export function LoopingContextProvider({
     execute();
   }, [update]);
 
+  // If there are currently loop ids, there
+  // is a loop active. This is needed to set the state when the side panel
+  // first loads.
+  useEffect(() => {
+    async function execute() {
+      const response = await commands.getLoopIds();
+      if (response.success) {
+        if (response.data.loopIds.length > 0) {
+          setEnabled(() => true);
+        } else {
+          setEnabled(() => false);
+        }
+      } else {
+        logger.error("Error syncing loop:", response.message);
+      }
+    }
+    execute();
+  }, []);
+
   async function enable() {
     logger.debug("Enabling looping");
     const response = await commands.enableLooping(savedState.get());
