@@ -26,19 +26,19 @@ export default function Console({
   }, [minLevel]);
 
   return (
-    <div ref={ref} className="console wrapper">
+    <div ref={ref} className="console-wrapper">
       {log.map((msg, i) => {
         if (msg.level < minLevel) {
           return null;
         }
         const message = toStringIndividual(msg);
         return (
-          <p key={i} className={"console entry"}>
-            <span className="console datetime">{message.datetime}</span>
-            <span className={`console level ${message.level.toLowerCase()}`}>
+          <p key={i} className={"console-entry"}>
+            <span className="console-datetime">{message.datetime}</span>
+            <span className={`console-level ${message.level.toLowerCase()}`}>
               {`[${message.level}]`}
             </span>
-            <span className="console message">{message.message}</span>
+            <span className="console-message">{message.message}</span>
           </p>
         );
       })}

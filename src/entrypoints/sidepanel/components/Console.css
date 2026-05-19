@@ -1,16 +1,17 @@
-.console.wrapper {
+.console-wrapper {
   max-block-size: 20rem;
   block-size: 20rem;
   overflow-y: scroll;
 
+  word-break: break-all;
 
-  .console.entry {
+  .console-entry {
     span:nth-child(2) {
       margin-inline: 0.5rem;
     }
   }
 
-  .console.level {
+  .console-level {
 
     &.debug {
       color: hsl(from blue h calc(s - 100) calc(l + 10));
