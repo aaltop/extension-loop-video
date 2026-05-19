@@ -11,6 +11,7 @@
 !src
 !assets
 !docs
+!public
 
 # DIRECTORIES
 # ============
@@ -20,7 +21,6 @@
 
 !.gitignore
 
-!public
 
 !package.json
 !pnpm-lock.yaml
@@ -32,6 +32,8 @@
 
 !apply_template.py
 !zensical.toml
+
+!LICENSE
 
 # FILES
 # ============
