@@ -3,6 +3,7 @@ import { commands } from "../commands";
 import { useSavedState } from "./SavedStateContext";
 import { handleResponse } from "../helpers";
 import ConsoleContext from "./ConsoleContext";
+import { synchronize } from "../messages";
 
 interface ContextState {
   // whether looping is enabled.
@@ -64,8 +65,8 @@ export function LoopingContextProvider({
   // If there are currently loop ids, there
   // is a loop active. This is needed to set the state when the side panel
   // first loads.
-  useEffect(() => {
-    async function execute() {
+  useEffect(
+    synchronize(async () => {
       const response = await commands.getLoopIds();
       if (response.success) {
         if (response.data.loopIds.length > 0) {
@@ -76,9 +77,9 @@ export function LoopingContextProvider({
       } else {
         logger.error("Error syncing loop:", response.message);
       }
-    }
-    execute();
-  }, []);
+    }),
+    [],
+  );
 
   async function enable() {
     logger.debug("Enabling looping");
