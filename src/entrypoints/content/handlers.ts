@@ -494,11 +494,15 @@ const _responseHandlers: ResponseRegistry = {
         const parsed = domainDataV1Schema.safeParse(data);
         if (parsed.success) {
           storage.setStoredData(data);
-          logger.log("Loaded data from file");
+          messages.log({
+            level: "INFO",
+            data: "Loaded data from file",
+          });
         } else {
-          logger.log(
-            `Invalid data read from file: ${z.prettifyError(parsed.error)}`,
-          );
+          messages.log({
+            level: "ERROR",
+            data: `Invalid data read from file: ${z.prettifyError(parsed.error)}`,
+          });
         }
       }
     });
