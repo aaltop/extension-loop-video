@@ -46,10 +46,10 @@ export default function DomainDataView() {
       </div>
       <details>
         <summary>Tags</summary>
-        <ul style={{ display: "flex" }}>
+        <ul className="domain-data-view-tags-list">
           {domainData.tagSet.values().map((tag) => {
             return (
-              <li style={{ listStyle: "none" }} key={tag}>
+              <li key={tag}>
                 <label>
                   {tag}
                   <input
@@ -93,7 +93,7 @@ export default function DomainDataView() {
               <p>{val.description ?? ""}</p>
               <ul>
                 {val.tags?.map((tag) => (
-                  <li>{tag}</li>
+                  <li key={tag}>{tag}</li>
                 ))}
               </ul>
             </li>

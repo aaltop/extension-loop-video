@@ -19,4 +19,15 @@
     padding: 0.5rem;
     border-radius: 0.5rem;
   }
+
+  .domain-data-view-tags-list {
+    display: flex;
+    li {
+      list-style: none;
+    }
+
+    label:has(input:checked) {
+      text-decoration: underline var(--brand-color) 2px;
+    }
+  }
 }

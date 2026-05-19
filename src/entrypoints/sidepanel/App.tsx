@@ -100,13 +100,12 @@ function ConsoleControl() {
     <details>
       <summary>
         Console{" "}
-        <select>
+        <select defaultValue={LoggingLevel.ERROR}>
           {Object.entries(LoggingLevel).map(([key, val]) => {
             return (
               <option
                 value={val}
                 key={key}
-                selected={val === LoggingLevel.ERROR}
                 onClick={() => {
                   setLevel(() => val);
                 }}

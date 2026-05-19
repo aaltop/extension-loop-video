@@ -68,13 +68,13 @@ export default function ElementHighlight() {
         <select
           onMouseEnter={() => queryAndSetElementList()}
           onFocus={() => queryAndSetElementList()}
+          defaultValue={loopableIndex.get()}
         >
           {elements.map((elem, idx) => {
             const state = elem.paused ? "paused" : "playing";
             return (
               <option
                 className={`element-highlight-video-option ${state}`}
-                selected={loopableIndex.get() === idx}
                 onClick={() => {
                   loopableIndex.set(idx);
                 }}
