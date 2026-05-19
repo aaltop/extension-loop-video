@@ -25,13 +25,15 @@ pages and loaded back between browser sessions. Private session data is always
 deleted. Data can also be saved to and loaded from file, allowing making backups
 or sharing loops etc.
 
-- Created loops can be browsed. Loops can be given titles, descriptions,
-and tags, and the list of created loops can be filtered based on these
+- Created [loops can be browsed](manual.md#domain-data). [Loops can be given titles, descriptions,
+and tags](manual.md#metadata), and the list of created loops can be filtered based on these
 details. The list has links associated with each loop, allowing for
 quick access to the page the loop was created for.
+
+See more details in [the manual](manual.md).
 
 ## Important
 
 Data is currently saved in localStorage, which could be wiped or run out of space.
-Backup your data if you're worried about losing it! See [the technical details](technical_details.md)
+[Backup your data](manual.md#controls) if you're worried about losing it! See [the technical details](technical_details.md#data-save-location)
 for more information.

@@ -19,6 +19,8 @@ The menu bar has two dropdowns:
 
 ## Metadata
 
+![The metadata section of the sidepanel.](./static/img/metadata.png)
+
 The metadata section is used for setting the metadata (title, description,
 tags) of loop data. For setting new tags, if any tags are set in other
 loop data of the current domain, those tags can be brought up as suggestions.
@@ -27,7 +29,12 @@ are brought up based on the written content. Otherwise the suggestions can be
 brought up with a double click or with <kbd>CTRL</kbd> + <kbd>DOWN ARROW</kbd>.
 This may be browser-dependent.
 
+Metadata is **not** saved automatically: in order to save, press **save state**
+in [the controls](#controls).
+
 ## Sections Table
+
+![The sections table section of the sidepanel.](./static/img/sections_table.png)
 
 The sections table allows creating the time sections for the loop. A *section*
 is a delimited part with a start and end time in the video. Looping happens only
@@ -68,7 +75,12 @@ The sections are expected to be in order, i.e. Section 1 should not have a
 start time that is after any part of Section 2. In general, if sections
 are in the wrong order or overlap, the resulting looping behaviour is undefined.
 
+Sections are **not** saved automatically: in order to save, press **save state**
+in [the controls](#controls).
+
 ## Controls
+
+![The controls section of the sidepanel.](./static/img/controls.png)
 
 The controls section contains numerous controls for the extension:
 
@@ -100,6 +112,8 @@ The controls section contains numerous controls for the extension:
 
 ## Domain Data
 
+![The domain data section of the sidepanel.](./static/img/domain_data.png)
+
 The domain data section allows looking through the loop data of [the current domain](https://en.wikipedia.org/wiki/Domain_name).
 It shows all the URLs for which loop data has been saved under the current
 domain. Items have titles, descriptions, and tags that can be set in [the metadata section](#metadata).
@@ -113,6 +127,8 @@ all saved data, while **Delete chosen** deletes any items from the list that
 are selected (the items have a selection box next to them).
 
 ## Console
+
+![The console section of the sidepanel. In the console is an example log with a timestamp, a level of ERROR, and a log message describing the error.](./static/img/console.png)
 
 A simple console helpful for debugging any issues that the extension may
 have. Shows logs created by the extension sidepanel, and allows selecting
