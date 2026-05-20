@@ -35,8 +35,9 @@ be a lot of work.
 The looping accuracy, how well the looping adheres to the set time sections,
 is limited. This is because the current video time is updated only every so
 often, supposedly [roughly every 15 to 250 milliseconds.](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event#:~:text=The%20event%20frequency%20is%20dependent%20on%20the%20system%20load%2C%20but%20will%20be%20thrown%20between%20about%204Hz%20and%2066Hz)
-This can vary depending on system load, but the bottom line is that the looping
-is not perfect.
+This can vary depending on system load, but the bottom line is that **looping
+is not perfect** because the current video time needs to be known before a decision
+can be made on whether a skip should be made to the next section.
 
 Accuracy (and performance) could potentially be improved because currently,
 [setInterval](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval)

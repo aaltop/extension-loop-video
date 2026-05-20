@@ -30,7 +30,7 @@ and tags](./docs/manual.md#metadata), and the list of created loops can be filte
 details. The list has links associated with each loop, allowing for
 quick access to the page the loop was created for.
 
-See more details in [the manual](./docs/manual.md).
+See more details in [the manual](./docs/manual.md), and check out [the basic usage examples](./docs/usage.md).
 
 ## Important
 
