@@ -1,5 +1,8 @@
 # Technical Details
 
+This section contains technical details for developers and for those curious
+about the internal workings of the extension.
+
 ## Data save location
 
 Most data is currently saved in [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
@@ -26,3 +29,20 @@ like localStorage (which is admittedly less important due to the much higher
 storage limits, and could even be a hindrance). Currently, there are no plans to make this move, as localStorage
 should likely be enough in most cases and switching to IndexedDB would potentially
 be a lot of work.
+
+## Looping accuracy
+
+The looping accuracy, how well the looping adheres to the set time sections,
+is limited. This is because the current video time is updated only every so
+often, supposedly [roughly every 15 to 250 milliseconds.](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event#:~:text=The%20event%20frequency%20is%20dependent%20on%20the%20system%20load%2C%20but%20will%20be%20thrown%20between%20about%204Hz%20and%2066Hz)
+This can vary depending on system load, but the bottom line is that the looping
+is not perfect.
+
+Accuracy (and performance) could potentially be improved because currently,
+[setInterval](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval)
+is used for querying the video time every 20 milliseconds. Changing to listening
+for [the timeupdate event](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event)
+would mean that updates happen as soon as and only when the
+video time changes. However, using intervals works and in testing hasn't been
+shown to tank performance, so changing to the event listener approach isn't
+a priority.
