@@ -37,3 +37,50 @@ See more details in [the manual](./docs/manual.md), and check out [the basic usa
 Data is currently saved in localStorage, which could be wiped or run out of space.
 [Backup your data](./docs/manual.md#controls) if you're worried about losing it! See [the technical details](./docs/technical_details.md#data-save-location)
 for more information.
+
+
+# Development
+
+For development, the following tools are needed:
+
+- [node](https://nodejs.org/en) (version ^24.13.1)
+- [pnpm](https://pnpm.io/) (version ^11.1.3)
+- A browser binary, for example [Firefox Developer Edition](https://www.firefox.com/en-US/channel/desktop/developer/).
+
+The following tools are optional, but may be useful:
+
+- [python](https://www.python.org/) (version ^3.12.3)
+    - Used for scripting in some places
+- [docker](https://www.docker.com/get-started/)
+    - Can be used to build the extension without the need for installing
+    other tools
+    - [docker engine](https://docs.docker.com/engine/) (version ^29.1.5)
+
+In the above, versioning is the recommended versioning, but other versions
+may also work.
+
+Development has been carried out on Linux (Ubuntu 24.04 LTS). Development
+requirements on other platforms may differ.
+
+## Developing
+
+1. Install packages:
+```sh
+pnpm install
+```
+
+2. Create the file `_config.ts` in the root directory, and export a value
+BINARY_FIREFOX from there:
+```typescript
+// replace <path/to/firefox/binary> with the path to your firefox binary
+export const BINARY_FIREFOX = "<path/to/firefox/binary>"
+```
+
+It is recommended that this be a [development version](https://www.firefox.com/en-US/channel/desktop/developer/)
+of the browser. The supplied binary will be used as the development browser;
+see [wxt.config.ts](./wxt.config.ts).
+
+
+
+
+## Building
