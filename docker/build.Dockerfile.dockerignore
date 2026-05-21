@@ -1,7 +1,6 @@
 /*
 .*
 
-
 # INCLUDE BACK
 # ------------
 
@@ -9,11 +8,7 @@
 # ------------
 
 !src
-!assets
-!docs
 !public
-
-!docker
 
 # DIRECTORIES
 # ============
@@ -21,23 +16,15 @@
 # FILES
 # ------------
 
-!.gitignore
-!README.md
-
-
+!manifest.json
 !package.json
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
 
+
 !tsconfig.json
 !wxt.config.ts
 !eslint.config.js
-
-!apply_template.py
-
-!zensical.toml
-
-!LICENSE
 
 # FILES
 # ============
