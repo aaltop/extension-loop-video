@@ -1,5 +1,5 @@
 import { defineConfig } from "wxt";
-import { BINARY_FIREFOX } from "./_config";
+import { BINARY_CHROME, BINARY_FIREFOX } from "./_config";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -8,6 +8,7 @@ export default defineConfig({
   webExt: {
     binaries: {
       firefox: BINARY_FIREFOX,
+      chrome: BINARY_CHROME,
     },
   },
   manifest: {

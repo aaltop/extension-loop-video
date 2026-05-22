@@ -26,6 +26,8 @@
 !wxt.config.ts
 !eslint.config.js
 
+!_config.example.ts
+
 # FILES
 # ============
 

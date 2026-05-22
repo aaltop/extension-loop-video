@@ -8,7 +8,7 @@ RUN pnpm runtime set node 24.13.1 -g
 
 # it's not actually used for the build, but it's still imported by
 # the WXT config so just add it as nothing
-RUN echo 'export const BINARY_FIREFOX = ""' > _config.ts
+RUN cat _config.example.ts > _config.ts
 
 RUN pnpm install
 
