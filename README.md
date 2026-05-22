@@ -41,6 +41,8 @@ for more information.
 
 # Development
 
+## Requirements
+
 For development, the following tools are needed:
 
 - [node](https://nodejs.org/en) (version ^24.13.1)
@@ -64,23 +66,62 @@ requirements on other platforms may differ.
 
 ## Developing
 
-1. Install packages:
+1. Create the file `_config.ts` (see [the example file](./_config.example.ts)) in the root directory, and export the values
+`BINARY_FIREFOX` and `BINARY_CHROME` from there:
+```typescript
+// replace <path/to/firefox/binary> with the path to your firefox binary
+export const BINARY_FIREFOX = "<path/to/firefox/binary>"
+// do the same as above but for chrome
+export const BINARY_CHROME = "<path/to/chrome/binary>"
+```
+
+The string can be left empty (or any string value) if development isn't being
+done using that browser.
+
+It is recommended that the firefox binary be a [development version](https://www.firefox.com/en-US/channel/desktop/developer/)
+of the browser. The supplied binary will be used as the development browser;
+see [wxt.config.ts](./wxt.config.ts).
+
+2. Install packages:
 ```sh
 pnpm install
 ```
 
-2. Create the file `_config.ts` in the root directory, and export a value
-BINARY_FIREFOX from there:
-```typescript
-// replace <path/to/firefox/binary> with the path to your firefox binary
-export const BINARY_FIREFOX = "<path/to/firefox/binary>"
+3. Use the appropriate dev command to start hot-reload development. For Firefox:
+```sh
+pnpm dev:firefox --mv3
+```
+and for Chrome:
+```sh
+pnpm dev --mv3
 ```
 
-It is recommended that this be a [development version](https://www.firefox.com/en-US/channel/desktop/developer/)
-of the browser. The supplied binary will be used as the development browser;
-see [wxt.config.ts](./wxt.config.ts).
+    the flag `--mv3` specifies that [Manifest V3](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
+    is to be used. See [the package.json scripts section](./package.json) for more details about the commands.
 
-
-
+    These commands open up the appropriate browser specified in step 1 with the
+    extension loaded, and will hot-reload the extension.
 
 ## Building
+
+The easiest way to build the extension is using Docker (see [the requirements](#requirements)).
+From the root of the directory,
+```sh
+sh ./docker/build.sh
+```
+will build the extension and output the build artifacts to `.output/`; If `sh`
+is not available, see [the executed script file](./docker/build.sh) for the commands
+or use another suitable shell. Building like this should only require Docker.
+
+To build the extension more manually, The [Dockerfile](./docker/build.Dockerfile)
+itself shows the steps needed to do that, but in short, replacing step 3 in
+[the 'developing' section](#developing) with
+```sh
+pnpm build:firefox --mv3
+```
+or for Chrome,
+```sh
+pnpm build --mv3
+```
+should do the job. These command will build the extension for the particular
+browser and output to `.output/`.
