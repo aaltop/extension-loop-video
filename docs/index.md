@@ -68,33 +68,33 @@ requirements on other platforms may differ.
 
 1. Create the file `_config.ts` (see [the example file](https://www.github.com/aaltop/extension-loop-video/blob/main/_config.example.ts)) in the root directory, and export the values
 `BINARY_FIREFOX` and `BINARY_CHROME` from there:
-```typescript
-// replace <path/to/firefox/binary> with the path to your firefox binary
-export const BINARY_FIREFOX = "<path/to/firefox/binary>"
-// do the same as above but for chrome
-export const BINARY_CHROME = "<path/to/chrome/binary>"
-```
+    ```typescript
+    // replace <path/to/firefox/binary> with the path to your firefox binary
+    export const BINARY_FIREFOX = "<path/to/firefox/binary>"
+    // do the same as above but for chrome
+    export const BINARY_CHROME = "<path/to/chrome/binary>"
+    ```
 
-The string can be left empty (or any string value) if development isn't being
-done using that browser.
+    The string can be left empty (or any string value) if development isn't being
+    done using that browser.
 
-It is recommended that the firefox binary be a [development version](https://www.firefox.com/en-US/channel/desktop/developer/)
-of the browser. The supplied binary will be used as the development browser;
-see [wxt.config.ts](https://www.github.com/aaltop/extension-loop-video/blob/main/wxt.config.ts).
+    It is recommended that the firefox binary be a [development version](https://www.firefox.com/en-US/channel/desktop/developer/)
+    of the browser. The supplied binary will be used as the development browser;
+    see [wxt.config.ts](https://www.github.com/aaltop/extension-loop-video/blob/main/wxt.config.ts).
 
 2. Install packages:
-```sh
-pnpm install
-```
+    ```sh
+    pnpm install
+    ```
 
 3. Use the appropriate dev command to start hot-reload development. For Firefox:
-```sh
-pnpm dev:firefox --mv3
-```
-and for Chrome:
-```sh
-pnpm dev --mv3
-```
+    ```sh
+    pnpm dev:firefox --mv3
+    ```
+    and for Chrome:
+    ```sh
+    pnpm dev --mv3
+    ```
 
     the flag `--mv3` specifies that [Manifest V3](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
     is to be used. See [the package.json scripts section](https://www.github.com/aaltop/extension-loop-video/blob/main/package.json) for more details about the commands.
