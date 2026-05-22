@@ -63,23 +63,27 @@ export function LoopingContextProvider({
   }, [update]);
 
   // If there are currently loop ids, there
-  // is a loop active. This is needed to set the state when the side panel
-  // first loads.
-  useEffect(
-    synchronize(async () => {
-      const response = await commands.getLoopIds();
-      if (response.success) {
-        if (response.data.loopIds.length > 0) {
-          setEnabled(() => true);
-        } else {
-          setEnabled(() => false);
-        }
+  // is a loop active. This is needed to set the state when a tab changes.
+  useEffect(synchronize(sync), []);
+  // The above should sync during first load of the sidepanel, but doesn't
+  // seem to, so just do this at the start because whatever
+  useEffect(() => {
+    sync();
+  }, []);
+
+  async function sync() {
+    const response = await commands.getLoopIds();
+    logger.debug("loop ids:", response);
+    if (response.success) {
+      if (response.data.loopIds.length > 0) {
+        setEnabled(() => true);
       } else {
-        logger.error("Error syncing loop:", response.message);
+        setEnabled(() => false);
       }
-    }),
-    [],
-  );
+    } else {
+      logger.error("Error syncing loop:", response.message);
+    }
+  }
 
   async function enable() {
     logger.debug("Enabling looping");
