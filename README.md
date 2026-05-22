@@ -111,17 +111,18 @@ sh ./docker/build.sh
 ```
 will build the extension and output the build artifacts to `.output/`; If `sh`
 is not available, see [the executed script file](./docker/build.sh) for the commands
-or use another suitable shell. Building like this should only require Docker.
+or use another suitable shell. Both the zipped and non-zipped build artifacts will
+be created. Building like this should only require Docker.
 
 To build the extension more manually, The [Dockerfile](./docker/build.Dockerfile)
 itself shows the steps needed to do that, but in short, replacing step 3 in
 [the 'developing' section](#developing) with
 ```sh
-pnpm build:firefox --mv3
+pnpm zip:firefox --mv3
 ```
 or for Chrome,
 ```sh
-pnpm build --mv3
+pnpm zip --mv3
 ```
 should do the job. These command will build the extension for the particular
-browser and output to `.output/`.
+browser and output the zipped extension contents to `.output/`.

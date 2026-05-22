@@ -12,9 +12,9 @@ RUN cat _config.example.ts > _config.ts
 
 RUN pnpm install
 
-RUN pnpm build:firefox --mv3
+RUN pnpm zip:firefox --mv3
 # builds chrome extension too
-RUN pnpm build --mv3
+RUN pnpm zip --mv3
 
 FROM scratch AS export
 
