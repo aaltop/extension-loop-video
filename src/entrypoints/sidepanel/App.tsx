@@ -181,8 +181,8 @@ export default function App() {
         <DomainDataView />
       </details>
 
-      <ConsoleControl />
       <hr />
+      <ConsoleControl />
     </div>
   );
 }
