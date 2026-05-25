@@ -10,6 +10,11 @@
 !src
 !public
 
+# include so that generated source code zips using wxt have it
+# makes the source code zip usable for submission, even though the docker
+# stuff isn't needed for docker itself.
+!docker
+
 # DIRECTORIES
 # ============
 
@@ -27,6 +32,9 @@
 !eslint.config.js
 
 !_config.example.ts
+!build.sh
+
+!README.md
 
 # FILES
 # ============

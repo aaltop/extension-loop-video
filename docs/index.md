@@ -43,25 +43,29 @@ for more information.
 
 ## Requirements
 
-For development, the following tools are needed:
+For development, the following tools are needed (unless just building using Docker; see further below):
 
 - [node](https://nodejs.org/en) (version ^24.13.1)
+    - Download: https://nodejs.org/en/download
 - [pnpm](https://pnpm.io/) (version ^11.1.3)
+    - Download: https://pnpm.io/installation
 - A browser binary, for example [Firefox Developer Edition](https://www.firefox.com/en-US/channel/desktop/developer/).
 
 The following tools are optional, but may be useful:
 
 - [python](https://www.python.org/) (version ^3.12.3)
     - Used for scripting in some places
+    - Download: https://www.python.org/downloads/
 - [docker](https://www.docker.com/get-started/)
     - Can be used to build the extension without the need for installing
     other tools
     - [docker engine](https://docs.docker.com/engine/) (version ^29.1.5)
+        - Download: https://docs.docker.com/engine/install
 
 In the above, versioning is the recommended versioning, but other versions
 may also work.
 
-Development has been carried out on Linux (Ubuntu 24.04 LTS). Development
+Development has been carried out on Linux (Ubuntu 24.04.4 LTS). Development
 requirements on other platforms may differ.
 
 ## Developing
@@ -111,8 +115,9 @@ sh ./docker/build.sh
 ```
 will build the extension and output the build artifacts to `.output/`; If `sh`
 is not available, see [the executed script file](https://www.github.com/aaltop/extension-loop-video/blob/main/docker/build.sh) for the commands
-or use another suitable shell. Both the zipped and non-zipped build artifacts will
-be created. Building like this should only require Docker.
+or use another suitable shell. This will create the zipped build artifacts: a
+Firefox-suitable extension, a Chrome-suitable extension, and the source code.
+Building like this should only require Docker.
 
 To build the extension more manually, The [Dockerfile](https://www.github.com/aaltop/extension-loop-video/blob/main/docker/build.Dockerfile)
 itself shows the steps needed to do that, but in short, replacing step 3 in
@@ -125,4 +130,5 @@ or for Chrome,
 pnpm zip --mv3
 ```
 should do the job. These command will build the extension for the particular
-browser and output the zipped extension contents to `.output/`.
+browser and output the zipped extension contents to `.output/`. See also
+[build.sh](https://www.github.com/aaltop/extension-loop-video/blob/main/build.sh) in the root.

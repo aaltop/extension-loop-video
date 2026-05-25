@@ -10,11 +10,7 @@ RUN pnpm runtime set node 24.13.1 -g
 # the WXT config so just add it as nothing
 RUN cat _config.example.ts > _config.ts
 
-RUN pnpm install
-
-RUN pnpm zip:firefox --mv3
-# builds chrome extension too
-RUN pnpm zip --mv3
+RUN sh build.sh
 
 FROM scratch AS export
 
